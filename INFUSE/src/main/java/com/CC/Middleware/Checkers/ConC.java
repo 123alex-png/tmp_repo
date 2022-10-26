@@ -104,7 +104,7 @@ public class ConC extends Checker {
     }
 
     @Override
-    public void ctxChangeCheckIMD(ContextChange contextChange) {
+    public void CtxChangeCheckIMD(ContextChange contextChange) {
         //consistency checking
         for(Rule rule : ruleHandler.getRuleList()){
             if(rule.getRelatedPatterns().contains(contextChange.getPattern_id())){
@@ -120,14 +120,16 @@ public class ConC extends Checker {
                     rule.addCriticalSet(links);
                 }
                 if(links != null){
-                    storeLink(rule.getRule_id(), rule.getCCTRoot().isTruth(), links);
+                    for(Link link : links){
+                        FormatLinks(rule.getRule_id(), link.getLinkType(), link.getVaSet());
+                    }
                 }
             }
         }
     }
 
     @Override
-    public void ctxChangeCheckBatch(Rule rule, List<ContextChange> batch) throws NotSupportedException {
+    public void CtxChangeCheckBatch(Rule rule, List<ContextChange> batch) throws NotSupportedException {
 
         for(ContextChange contextChange : batch){
             contextPool.ApplyChange(rule.getRule_id(), contextChange);
@@ -139,7 +141,9 @@ public class ConC extends Checker {
             rule.addCriticalSet(links);
         }
         if(links != null){
-            storeLink(rule.getRule_id(), rule.getCCTRoot().isTruth(), links);
+            for(Link link : links){
+                FormatLinks(rule.getRule_id(), link.getLinkType(), link.getVaSet());
+            }
         }
     }
 }

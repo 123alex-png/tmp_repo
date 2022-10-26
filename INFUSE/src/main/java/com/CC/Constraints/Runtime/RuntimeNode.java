@@ -37,7 +37,6 @@ public class RuntimeNode {
         this.varEnv = new HashMap<>();
         this.parent = null;
         this.kidsVT = new HashMap<>();
-        this.links = new HashSet<>();
         if(formula.getFormula_type() == Formula.Formula_Type.FORALL){
             this.setTruth(true);
             this.setOptTruth(true);
@@ -76,7 +75,8 @@ public class RuntimeNode {
     }
 
     public Set<Link> getLinks() {
-        assert links != null;
+        if(links == null)
+            return null;
         Set<Link> result = new HashSet<>();
         for(Link link : links){
             try {

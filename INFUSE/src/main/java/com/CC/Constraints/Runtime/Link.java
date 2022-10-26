@@ -52,18 +52,13 @@ public class Link implements Cloneable{
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Link link = (Link) o;
-
-        if (linkType != link.linkType) return false;
-        return vaSet.equals(link.vaSet);
+        return linkType == link.linkType && Objects.equals(vaSet, link.vaSet);
     }
 
     @Override
     public int hashCode() {
-        int result = linkType.hashCode();
-        result = 31 * result + vaSet.hashCode();
-        return result;
+        return Objects.hash(linkType, vaSet);
     }
 
     @Override

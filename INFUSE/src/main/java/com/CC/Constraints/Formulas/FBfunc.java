@@ -6,9 +6,12 @@ import com.CC.Constraints.Runtime.Link;
 import com.CC.Constraints.Runtime.RuntimeNode;
 import com.CC.Contexts.Context;
 import com.CC.Contexts.ContextChange;
+import com.CC.Contexts.TaxiContext;
 import com.CC.Middleware.Checkers.Checker;
 import com.CC.Middleware.Schedulers.Scheduler;
 
+import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -349,24 +352,34 @@ public class FBfunc extends Formula {
 
 
 
+
+
     public boolean bfuncCaller(HashMap<String, Context> varEnv, Checker checker){
         Map<String, Map<String, String>> vcMap = new HashMap<>();
         for(String pos : params.keySet()){
             HashMap<String, String> ctxInfos = new HashMap<>();
             Context context = varEnv.get(params.get(pos).var);
 
-            ctxInfos.put("ctx_id", context.getCtx_id());
-            for(String attriName : context.getCtx_fields().keySet()){
-                ctxInfos.put(attriName, context.getCtx_fields().get(attriName));
+            for(Class<?> clazz = context.getClass(); clazz != Object.class ; clazz = clazz.getSuperclass()) {
+                Field[] fields = clazz.getDeclaredFields();
+                for (Field field : fields) {
+                    field.setAccessible(true);
+                    try {
+                        ctxInfos.put(field.getName().substring(4), (String) field.get(context));
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
+
             vcMap.put(params.get(pos).var, ctxInfos);
         }
 
         boolean result = false;
         try {
-            Object bfuncInstance = checker.getBfuncInstance();
-            Method m = bfuncInstance.getClass().getMethod("bfunc", String.class, Class.forName("java.util.Map"));
-            result = (boolean) m.invoke(bfuncInstance,func, vcMap);
+            Object bfunctions = checker.getBfunctions();
+            Method m = bfunctions.getClass().getMethod("evaluateBfunc", String.class, Class.forName("java.util.Map"));
+            result = (boolean) m.invoke(bfunctions,func, vcMap);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }

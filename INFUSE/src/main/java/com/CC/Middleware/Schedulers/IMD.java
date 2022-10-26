@@ -19,7 +19,7 @@ public class IMD extends Scheduler{
 
     @Override
     public void doSchedule(ContextChange contextChange) throws Exception {
-        this.checker.ctxChangeCheckIMD(contextChange);
+        this.checker.CtxChangeCheckIMD(contextChange);
     }
 
     @Override

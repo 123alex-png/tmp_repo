@@ -18,26 +18,12 @@ public class BASE extends ConC{
     }
 
     @Override
-    public void ctxChangeCheckIMD(ContextChange contextChange) {
+    public void CtxChangeCheckIMD(ContextChange contextChange) {
         for(Rule rule : ruleHandler.getRuleList()){
             if(rule.getRelatedPatterns().contains(contextChange.getPattern_id())){
                 //apply changes
                 contextPool.ApplyChange(rule.getRule_id(), contextChange);
                 rule.UpdateAffectedWithOneChange(contextChange, this);
-                //modify CCT
-                rule.ModifyCCT_BASE(contextChange, this);
-                //truth evaluation
-                rule.TruthEvaluation_BASE(contextChange, this);
-                //links generation
-                Set<Link> links = rule.LinksGeneration_BASE(contextChange, this);
-                if(links != null){
-                    rule.addCriticalSet(links);
-                }
-                rule.CleanAffected();
-                if(links != null){
-                    storeLink(rule.getRule_id(), rule.getCCTRoot().isTruth(), links);
-                }
-                /*
                 //modify CCT
                 if(rule.isCCTAlready()){
                     rule.ModifyCCT_BASE(contextChange, this);
@@ -50,7 +36,9 @@ public class BASE extends ConC{
                     }
                     rule.CleanAffected();
                     if(links != null){
-                        storeLink(rule.getRule_id(), rule.getCCTRoot().isTruth(), links);
+                        for(Link link : links){
+                            FormatLinks(rule.getRule_id(), link.getLinkType(), link.getVaSet());
+                        }
                     }
                 }
                 //build CCT
@@ -66,17 +54,17 @@ public class BASE extends ConC{
                     }
                     rule.CleanAffected();
                     if(links != null){
-                        storeLink(rule.getRule_id(), rule.getCCTRoot().isTruth(), links);
+                        for(Link link : links) {
+                            FormatLinks(rule.getRule_id(), link.getLinkType(), link.getVaSet());
+                        }
                     }
                 }
-
-                 */
             }
         }
     }
 
     @Override
-    public void ctxChangeCheckBatch(Rule rule, List<ContextChange> batch) throws NotSupportedException {
+    public void CtxChangeCheckBatch(Rule rule, List<ContextChange> batch) throws NotSupportedException {
         throw new NotSupportedException("not support");
     }
 

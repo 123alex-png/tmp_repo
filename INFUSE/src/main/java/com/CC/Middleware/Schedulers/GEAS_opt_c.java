@@ -11,6 +11,7 @@ import com.CC.Middleware.Checkers.Checker;
 import com.CC.Middleware.NotSupportedException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -32,7 +33,7 @@ public class GEAS_opt_c extends GEAS_ori{
         Batch_FormAndRefine_Concurrent(contextChange);
         for(Rule rule : ruleHandler.getRuleList()){
             if(rule.getNewBatch() != null){
-                this.checker.ctxChangeCheckBatch(rule, rule.getBatch());
+                this.checker.CtxChangeCheckBatch(rule, rule.getBatch());
                 rule.setBatch(rule.getNewBatch());
                 rule.setNewBatch(null);
             }

@@ -17,14 +17,13 @@ public class PCC extends Checker{
     }
 
     @Override
-    public void ctxChangeCheckIMD(ContextChange contextChange) {
+    public void CtxChangeCheckIMD(ContextChange contextChange) {
         //consistency checking
         for(Rule rule : ruleHandler.getRuleList()){
             if(rule.getRelatedPatterns().contains(contextChange.getPattern_id())){
                 //apply changes
                 contextPool.ApplyChange(rule.getRule_id(), contextChange);
                 rule.UpdateAffectedWithOneChange(contextChange, this);
-                /*
                 //modify CCT
                 if(rule.isCCTAlready()){
                     rule.ModifyCCT_PCC(contextChange, this);
@@ -38,7 +37,9 @@ public class PCC extends Checker{
                     }
                     rule.CleanAffected();
                     if(links != null){
-                        storeLink(rule.getRule_id(), rule.getCCTRoot().isTruth(), links);
+                        for(Link link : links){
+                            FormatLinks(rule.getRule_id(), link.getLinkType(), link.getVaSet());
+                        }
                     }
                 }
                 //build CCT
@@ -55,30 +56,17 @@ public class PCC extends Checker{
                     }
                     rule.CleanAffected();
                     if(links != null){
-                        storeLink(rule.getRule_id(), rule.getCCTRoot().isTruth(), links);
+                        for(Link link : links) {
+                            FormatLinks(rule.getRule_id(), link.getLinkType(), link.getVaSet());
+                        }
                     }
-                }
-                 */
-
-                rule.ModifyCCT_PCC(contextChange, this);
-                //truth evaluation
-                rule.TruthEvaluation_PCC(contextChange, this);
-                //links generation
-                Set<Link> links = rule.LinksGeneration_PCC(contextChange, this);
-                if(links != null){
-                    rule.addCriticalSet(links);
-                    //rule.oracleCount(links, contextChange);
-                }
-                rule.CleanAffected();
-                if(links != null){
-                    storeLink(rule.getRule_id(), rule.getCCTRoot().isTruth(), links);
                 }
             }
         }
     }
 
     @Override
-    public void ctxChangeCheckBatch(Rule rule, List<ContextChange> batch) {
+    public void CtxChangeCheckBatch(Rule rule, List<ContextChange> batch) {
         //rule.intoFile(batch);
         //clean
         for(String pattern_id : rule.getRelatedPatterns()){
@@ -88,16 +76,12 @@ public class PCC extends Checker{
         }
         for(ContextChange contextChange : batch){
             contextPool.ApplyChangeWithSets(rule.getRule_id(), contextChange);
-            /*
             if(rule.isCCTAlready()){
                 rule.ModifyCCT_PCCM(contextChange, this);
             }
             else{
                 rule.BuildCCT_ECCPCC(this);
             }
-
-             */
-            rule.ModifyCCT_PCCM(contextChange, this);
         }
         rule.UpdateAffectedWithChanges(this);
         rule.TruthEvaluation_PCCM(this);
@@ -107,7 +91,9 @@ public class PCC extends Checker{
         }
         rule.CleanAffected();
         if(links != null){
-            storeLink(rule.getRule_id(), rule.getCCTRoot().isTruth(), links);
+            for(Link link : links) {
+                FormatLinks(rule.getRule_id(), link.getLinkType(), link.getVaSet());
+            }
         }
     }
 
