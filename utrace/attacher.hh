@@ -12,25 +12,18 @@
 //The watcher assumes that the user has root access and makes no mistake and the work never stop.
 //More variables and more breakpoints can temporily be done by more watcher, and this work is taken as one of the future's goal. 
 
-struct Stream;
-
 class attacher{
-    private:
-        //for temporarily save the data
-        Stream stream;
     public:
         using Var=std::string;
         using Val=std::pair<time_t,std::string>;
         using BreakPoint=std::string;
-        attacher()=default;
+        //for temporarily save the data
+        std::queue<Val> stream;
+        std::mutex lock;
+        attacher(){};
         //filename for dbg info
         void attach_watch(int pid,BreakPoint breakPoint,Var var);
         Val event();
-};
-
-struct Stream{
-    std::queue<attacher::Val> q;
-    std::mutex lock;
 };
 
 #endif
