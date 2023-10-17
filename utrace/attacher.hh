@@ -10,7 +10,7 @@
 //For simplicity, this watcher can only monitor ONE variable at ONE breakpoint for ONE process.
 //Variable ,breakpoint and var's value are all prased as string. The analysis of the string-form val is taken as user's work.
 //The watcher assumes that the user has root access and makes no mistake and the work never stop.
-//More variables and more breakpoints can temporily be done by more watcher, and this work is taken as one of the future's goal. 
+//Support of more variables and more breakpoints is taken as one of the future's goal. 
 
 class attacher{
     public:
