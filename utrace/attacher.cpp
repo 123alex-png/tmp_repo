@@ -9,6 +9,8 @@
 #include <cstring>
 #include <map>
 using std::string;
+using std::cout;
+using std::endl;
 
 #define DEBUG
 
@@ -66,6 +68,7 @@ class xpipe{
             for(char * p=strtok(buffer," ,");p;p=strtok(NULL," ,")) {
                 string s=string(p);
                 if(s=="(gdb)") continue;
+                if(s=="exited") exit(0);
                 ret.push_back(s);
             }
             //for(string &s:ret) LOG("Divided: %s",s.c_str());
@@ -73,7 +76,7 @@ class xpipe{
         }
 };
 
-static void gdb_run(std::queue<attacher::Val> * out, std::mutex * lock, int pid,const attacher::Config &config){
+static void gdb_run(int pid,const attacher::Config &config){
     xpipe communicate;
     pid_t p=fork();
     if(!p){//run gdb
@@ -109,21 +112,16 @@ static void gdb_run(std::queue<attacher::Val> * out, std::mutex * lock, int pid,
                 if(line.size()>0&&line[0]=="Breakpoint") break;
             }
             int id=breakpoint_id[line[1]];
-            attacher::Val val;
-            val.first=time(NULL);
-            val.second.first=config[id].first;
+            cout<<time(NULL)<<":"<<config[id].first;
             for(auto var:config[id].second){
                 communicate.fa_write("print %s\n",var.c_str());
                 while(1){
                     line=communicate.fa_getline();
                     if(line.size()>=3&&line[1]=="=") break;
                 }
-                val.second.second.push_back(line[2]);
+                cout<<"\n    "<<var<<":"<<line[2];
             }
-            lock->lock();
-            out->push(val);
-            lock->unlock();
-
+            cout<<endl;
             communicate.fa_write("continue\n");
         }
 
@@ -133,18 +131,7 @@ static void gdb_run(std::queue<attacher::Val> * out, std::mutex * lock, int pid,
 
 void attacher::attach_watch(int pid,Config config){
     LOG("attach & watch");
-    std::thread t(gdb_run,&stream,&lock,pid,config);
-    t.detach();
+    std::thread t(gdb_run,pid,config);
+    t.join();
     return;
 }
-
-attacher::Val attacher::event(){
-    lock.lock();
-    Val ans={0,{}};
-    if(!stream.empty()){
-        ans=stream.front();
-        stream.pop();
-    }
-    lock.unlock();
-    return ans;
-};

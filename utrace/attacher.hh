@@ -20,13 +20,9 @@ class attacher{
         using Config=std::vector<std::pair<BreakPoint,std::vector<Var> > >;
         using Val=std::pair<time_t,
                             std::pair<BreakPoint,std::vector<std::string> > >;
-        //for temporarily save the data
-        std::queue<Val> stream;
-        std::mutex lock;
         attacher(){};
         //filename for dbg info
         void attach_watch(int pid,Config config);
-        Val event();
 };
 
 #endif
