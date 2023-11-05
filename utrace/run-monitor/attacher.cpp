@@ -1,4 +1,3 @@
-#include "attacher.hh"
 #include <thread>
 #include <unistd.h>
 #include <assert.h>
@@ -8,7 +7,8 @@
 #include <vector>
 #include <cstring>
 #include <map>
-using std::string;
+#include <common.hpp>
+
 using std::cout;
 using std::endl;
 
@@ -76,7 +76,7 @@ class xpipe{
         }
 };
 
-static void gdb_run(int pid,const attacher::Config &config){
+static void gdb_run(const string &pid){
     xpipe communicate;
     pid_t p=fork();
     if(!p){//run gdb
@@ -84,21 +84,15 @@ static void gdb_run(int pid,const attacher::Config &config){
         communicate.ch_init();
         dup2(communicate.fa2ch_read(),STDIN_FILENO);
         dup2(communicate.ch2fa_write(),STDOUT_FILENO);
-        char Pid[40];
-        sprintf(Pid,"%d",pid);
-        char * args[]={
-            "/usr/bin/gdb","-p",Pid
-        };
-        execv(args[0],args);
-        printf("ERR: %d\n",errno);
+        execlp("gdb","gdb","-p",pid.c_str(),NULL);
         assert(0);
     }else{//communicate with gdb
         LOG("Try to communicate!");
         communicate.fa_init();
         std::map<string,int> breakpoint_id;
         std::vector<string> line;
-        for(int i=0;i<config.size();i++){
-            communicate.fa_write("break %s\n",config[i].first.c_str());
+        for(int i=0;i<streams.size();i++){
+            communicate.fa_write("break %s\n",streams[i].breakpoint.c_str());
             while(1){
                 line=communicate.fa_getline();
                 if(line.size()>3&&line[0]=="Breakpoint") break;
@@ -112,15 +106,15 @@ static void gdb_run(int pid,const attacher::Config &config){
                 if(line.size()>0&&line[0]=="Breakpoint") break;
             }
             int id=breakpoint_id[line[1]];
-            cout<<time(NULL)<<":"<<config[id].first;
-            for(auto var:config[id].second){
+            cout<<time(NULL)<<":"<<streams[id].name<<"--"<<streams[id].breakpoint<<endl;
+            /*for(auto var:config[id].second){
                 communicate.fa_write("print %s\n",var.c_str());
                 while(1){
                     line=communicate.fa_getline();
                     if(line.size()>=3&&line[1]=="=") break;
                 }
                 cout<<"\n    "<<var<<":"<<line[2];
-            }
+            }*/
             cout<<endl;
             communicate.fa_write("continue\n");
         }
@@ -129,9 +123,6 @@ static void gdb_run(int pid,const attacher::Config &config){
     }
 }
 
-void attacher::attach_watch(int pid,Config config){
-    LOG("attach & watch");
-    std::thread t(gdb_run,pid,config);
-    t.join();
-    return;
+void run_monitor(const string &pid){
+    gdb_run(pid);
 }
