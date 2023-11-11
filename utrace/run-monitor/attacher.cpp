@@ -1,7 +1,6 @@
 #include <assert.h>
 #include <common.hpp>
 #include <cstring>
-#include <ctime>
 #include <iostream>
 #include <map>
 #include <stdarg.h>

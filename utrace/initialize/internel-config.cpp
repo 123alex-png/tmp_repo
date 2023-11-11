@@ -1,4 +1,5 @@
 #include <common.hpp>
+#include <ctime>
 #include <iostream>
 
 using std::cout;
@@ -8,11 +9,14 @@ using std::vector;
 
 class simpleData : public data {
 	private:
+	string breakpoint;
 	vector<string> vals;
 
 	public:
-	simpleData(const vector<string>& vals) : vals(vals) {}
+	simpleData(const string breakpoint, const vector<string>& vals)
+		: breakpoint(breakpoint), vals(vals) {}
 	void output() const {
+		cout << time(0) << ": Breakpoint: " << breakpoint << ": ";
 		for (auto& val : vals)
 			cout << val << ' ';
 		cout << endl;
@@ -30,7 +34,7 @@ class simpleBreakpointHandler : public breakpointhandler {
 		vector<string> vals;
 		for (auto& var : vars)
 			vals.push_back(readVar(var));
-		return new simpleData(vals);
+		return new simpleData(breakpoint, vals);
 	}
 };
 
