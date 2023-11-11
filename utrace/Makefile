@@ -1,8 +1,10 @@
 SRC=$(shell find -name "*.cpp")
+include=$(shell find -name "*.hpp")
 INC=-I./include
 TARGET=build/test
 
-$(TARGET):$(SRC) $(shell find -name "*.hpp")
+$(TARGET):$(SRC) $(include)
+	clang-format -i $(SRC) $(filter-out ./include/toml.hpp, $(include))
 	mkdir -p build
 	g++ -std=c++17 $(INC) -g $(SRC) -o $@ 
 
