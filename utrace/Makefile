@@ -11,4 +11,7 @@ $(TARGET):$(SRC) $(include)
 run: $(TARGET)
 	./$< example-input/config.toml
 
-.phony:run
+gdb: $(TARGET)
+	gdb ./$< example-input/config.toml
+
+.phony:run gdb

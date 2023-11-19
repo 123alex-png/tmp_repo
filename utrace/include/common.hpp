@@ -1,52 +1,58 @@
 #ifndef COMMON_HPP
 #define COMMON_HPP
 
-#include <functional>
 #include <string>
 #include <vector>
 
 class data {
-	public:
+public:
 	virtual void output() const = 0;
 };
 
+class interface {
+public:
+	virtual std::string addBreakpoint(const std::string& breakPoint) = 0;
+	virtual std::pair<std::string, std::string>
+	readVar(const std::string& var) = 0;
+	virtual bool continueExec() = 0;
+	virtual std::string currentBreakpointHit() const = 0;
+};
+
 class breakpointhandler {
-	public:
-	virtual data*
-	handle(const std::string& breakpoint,
-		   std::function<std::string(const std::string&)> readVar) = 0;
+public:
+	virtual data* handle(const std::string& breakpoint, interface& inter) = 0;
 };
 
 class stream {
-	private:
+private:
 	std::string name, breakpoint;
 	breakpointhandler* handler;
 
-	public:
+public:
 	stream(const std::string& name, const std::string& breakpoint,
 		   breakpointhandler* handler)
 		: name(name), breakpoint(breakpoint), handler(handler) {}
 	std::string getName() const { return name; }
 	std::string getBreakPoint() const { return breakpoint; }
-	data* handle(std::function<std::string(const std::string&)> readVar) const {
-		return handler->handle(breakpoint, readVar);
+	data* handle(const std::string& breakpoint, interface& inter) const {
+		return handler->handle(breakpoint, inter);
 	}
 };
 
 class processFilter {
-	public:
+public:
 	virtual bool check(const std::string& filename) = 0;
 };
 
 class config {
-	private:
+private:
 	std::string name;
 	std::vector<std::string> arguments;
 	processFilter* filter;
 
 	std::vector<stream> streams;
 
-	public:
+public:
 	config(const std::string& name, const std::vector<std::string>& arguments,
 		   processFilter* filter, const std::vector<stream>& streams)
 		: name(name), arguments(arguments), filter(filter), streams(streams) {}

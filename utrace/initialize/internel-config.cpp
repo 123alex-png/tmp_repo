@@ -8,11 +8,11 @@ using std::string;
 using std::vector;
 
 class simpleData : public data {
-	private:
+private:
 	string breakpoint;
 	vector<string> vals;
 
-	public:
+public:
 	simpleData(const string breakpoint, const vector<string>& vals)
 		: breakpoint(breakpoint), vals(vals) {}
 	void output() const {
@@ -24,22 +24,21 @@ class simpleData : public data {
 };
 
 class simpleBreakpointHandler : public breakpointhandler {
-	private:
+private:
 	vector<string> vars;
 
-	public:
+public:
 	simpleBreakpointHandler(const vector<string>& vars) : vars(vars) {}
-	data* handle(const string& breakpoint,
-				 std::function<string(const string&)> readVar) override {
+	data* handle(const string& breakpoint, interface& inter) override {
 		vector<string> vals;
 		for (auto& var : vars)
-			vals.push_back(readVar(var));
+			vals.push_back(inter.readVar(var).second);
 		return new simpleData(breakpoint, vals);
 	}
 };
 
 class simpleProcessFilter : public processFilter {
-	public:
+public:
 	bool check(const string& filename) { return true; }
 };
 
