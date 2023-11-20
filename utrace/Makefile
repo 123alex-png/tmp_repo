@@ -2,6 +2,7 @@ SRC=$(shell find -name "*.cpp")
 include=$(shell find -name "*.hpp")
 INC=-I./include
 TARGET=build/test
+ARGS=/home/caoyunfan/busybox-1.36.1/busybox_unstripped tar -cvf /tmp/archive.tar /tmp/dummy
 
 $(TARGET):$(SRC) $(include)
 	clang-format -i $(SRC) $(filter-out ./include/toml.hpp, $(include))
@@ -9,9 +10,9 @@ $(TARGET):$(SRC) $(include)
 	g++ -std=c++17 $(INC) -g $(SRC) -o $@ 
 
 run: $(TARGET)
-	./$< example-input/config.toml
+	./$< $(ARGS)
 
 gdb: $(TARGET)
-	gdb ./$< example-input/config.toml
+	gdb ./$< --args $< $(ARGS)
 
 .phony:run gdb

@@ -70,17 +70,18 @@ public:
 		string command = "gdb --interpreter=mi -p " + pid;
 		gdbProcess =
 			bp::child(command, bp::std_in<gdbInput, bp::std_out> gdbOutput);
-		std::cout << "GDB process launched: " << command << std::endl;
 		// Wait for GDB to start
 		string output;
 		while (!output.empty()) {
 			std::getline(gdbOutput, output);
 			// std::cout << "GDB output: " << output << std::endl;
 		}
+		std::cout << command << std::endl;
 	}
 
 	~gdbInterface() {
 		// Terminate GDB process
+		sendCommand("-gdb-exit");
 		gdbProcess.terminate();
 		gdbProcess.wait();
 		gdbInput.close();

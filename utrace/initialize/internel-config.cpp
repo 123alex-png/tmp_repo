@@ -42,14 +42,44 @@ public:
 	bool check(const string& filename) { return true; }
 };
 
-config* simpleConfigInitialize() {
-	vector<string> args;
-	args.push_back("a.out");
-	vector<string> vars;
-	vars.push_back("x");
-	vars.push_back("y");
+config* tarFile() {
+	vector<string> args{"busybox_unstripped", "tar"};
+	vector<stream> streams;
+	streams.push_back(stream("xfopen", "xfuncs_printf.c:137",
+							 new simpleBreakpointHandler({"path", "fp"})));
+
+	streams.push_back(stream("xopen3", "xfuncs_printf.c:148",
+							 new simpleBreakpointHandler({"pathname", "ret"})));
+
+	streams.push_back(stream("open3_or_warn", "xfuncs_printf.c:166",
+							 new simpleBreakpointHandler({"pathname", "ret"})));
+
+	streams.push_back(stream("dir", "data_extract_all.c:167",
+							 new simpleBreakpointHandler({"dst_name", "res"})));
+
+	streams.push_back(stream("dstdir", "make_directory.c:96",
+							 new simpleBreakpointHandler({"path"})));
+
+	return new config("busybox_unstripped", args, new simpleProcessFilter(),
+					  streams);
+}
+
+config* dummy() {
+	vector<string> args{"a.out"};
 	vector<stream> streams;
 	streams.push_back(
-		stream("stdout", "a.cpp:8", new simpleBreakpointHandler(vars)));
+		stream("break1", "a.cpp:8", new simpleBreakpointHandler({"x", "y"})));
 	return new config("a.out", args, new simpleProcessFilter(), streams);
+}
+
+config* simpleConfigInitialize() {
+	int id = 2;
+	switch (id) {
+	case 1:
+		return dummy();
+	case 2:
+		return tarFile();
+	default:
+		return NULL;
+	}
 }

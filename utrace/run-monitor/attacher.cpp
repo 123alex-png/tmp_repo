@@ -1,10 +1,9 @@
-#include "gdb-hook.hpp"
 #include <common.hpp>
 #include <unordered_map>
 using std::string;
 
-void run_monitor(const string& pid, const std::vector<stream>& streams) {
-	interface* dbg = gdbInterfacebuild(pid);
+void run_monitor(const string& pid, const std::vector<stream>& streams,
+				 interface* dbg) {
 	std::unordered_map<string, const stream&> breakpoints;
 	for (auto& stream : streams) {
 		if (dbg->addBreakpoint(stream.getBreakPoint()).empty())
