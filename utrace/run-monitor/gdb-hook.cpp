@@ -19,6 +19,7 @@ private:
 	bp::ipstream gdbOutput;
 	std::unordered_map<string, string> breakpoints;
 	string currentBreakpoint;
+	enum class state { running, stopped } state;
 
 	void sendCommand(const string& command) {
 		// Send command to GDB
@@ -64,10 +65,17 @@ private:
 	}
 
 public:
-	gdbInterface(const std::string& pid)
+	gdbInterface(const std::string& pid, const std::vector<string>& argv)
 		: gdbProcess(), gdbInput(), gdbOutput() {
 		// Launch GDB process
 		string command = "gdb --interpreter=mi -p " + pid;
+		state = state::running;
+		if (pid.empty()) {
+			command = "gdb --interpreter=mi " + argv[0] + " --args ";
+			for (const auto& arg : argv)
+				command += " " + arg;
+			state = state::stopped;
+		}
 		gdbProcess =
 			bp::child(command, bp::std_in<gdbInput, bp::std_out> gdbOutput);
 		// Wait for GDB to start
@@ -106,9 +114,8 @@ public:
 		return ret;
 	}
 
-	std::pair<string, string> readVar(const string& var) override {
-		sendCommand("-var-create myvar * " + var);
-		sendCommand("-var-evaluate-expression myvar");
+	string expEval(const string& exp) override {
+		sendCommand((string) "-data-evaluate-expression \"" + exp + "\"");
 		string value = "";
 		do {
 			string output = readGDB();
@@ -123,29 +130,16 @@ public:
 				value = valueMatch[1].str();
 			}
 		} while (value.empty());
-		sendCommand("-var-info-type myvar");
-		string type = "";
-		do {
-			string output = readGDB();
-			if (output.find("error") != string::npos) {
-				throw std::runtime_error("Error reading variable");
-			}
-			std::regex typeRegex("\\^done,type=\"(.*)\"");
-			std::smatch typeMatch;
-
-			if (std::regex_search(output, typeMatch, typeRegex) &&
-				typeMatch.size() == 2) {
-				type = typeMatch[1].str();
-			}
-		} while (type.empty());
-		sendCommand("-var-delete myvar");
-		return {type, value};
+		return value;
 	}
 
 	bool continueExec() override {
 		// Send continue command to GDB
-		sendCommand("-exec-continue");
-
+		if (state == state::stopped)
+			sendCommand("-exec-run");
+		else
+			sendCommand("-exec-continue");
+		state = state::running;
 		string reason = "";
 		do {
 			// Read GDB output
@@ -170,7 +164,8 @@ public:
 	}
 };
 
-interface* gdbInterfacebuild(const string& pid) {
-	return new gdbInterface(pid);
+interface* gdbInterfacebuild(const string& pid,
+							 const std::vector<string>& argv) {
+	return new gdbInterface(pid, argv);
 }
 #endif

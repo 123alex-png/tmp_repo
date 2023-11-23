@@ -1,15 +1,21 @@
 #include <common.hpp>
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <linux/cn_proc.h>
 #include <linux/connector.h>
 #include <linux/netlink.h>
+#include <netinet/in.h>
+#include <sstream>
 #include <sys/procfs.h>
 #include <sys/socket.h>
-#include <thread>
 #include <unistd.h>
+#include <watch.hpp>
 
 using std::string;
+
+extern void run_monitor(const std::vector<stream>& streams, const string& pid,
+						const std::vector<string>& argv, socketClose& sync);
 
 static int nl_connect() {
 	int rc;
@@ -68,7 +74,7 @@ static int set_proc_ev_listen(int nl_sock, bool enable) {
 	return 0;
 }
 
-bool check(string filename, config* cfg) {
+static bool check(string filename, config* cfg) {
 	static char buf[1024];
 
 	FILE* fp = fopen(("/proc/" + filename + "/comm").c_str(), "r");
@@ -82,15 +88,31 @@ bool check(string filename, config* cfg) {
 	if (comm != cfg->getName())
 		return false;
 
-	fp = fopen(("/proc/" + filename + "/cmdline").c_str(), "r");
-	if (fp == NULL)
-		return false;
-	fgets(buf, 1024, fp);
-	fclose(fp);
-	string cmdline = buf;
-	for (const auto& arg : cfg->getArguments())
-		if (cmdline.find(arg) == string::npos)
+	std::vector<std::string> arguments;
+	std::ifstream file("/proc/" + filename + "/cmdline");
+	if (file.is_open()) {
+		std::stringstream buffer;
+		buffer << file.rdbuf();
+
+		std::string cmdline = buffer.str();
+		std::istringstream iss(cmdline);
+		std::string argument;
+
+		while (getline(iss, argument, '\0')) {
+			arguments.push_back(argument);
+		}
+	}
+	for (const auto& arg : cfg->getArguments()) {
+		bool flag = false;
+		for (const auto& argument : arguments) {
+			if (argument.find(arg) != std::string::npos) {
+				flag = true;
+				break;
+			}
+		}
+		if (!flag)
 			return false;
+	}
 
 	if (!cfg->chk())
 		return false;
@@ -118,25 +140,20 @@ static int handle_proc_ev(int nl_sock, config* cfg) {
 			return -1;
 		}
 		if (nlcn_msg.proc_ev.what == proc_event::PROC_EVENT_EXEC) {
-			extern interface* gdbInterfacebuild(const string& pid);
 			string filename =
 				std::to_string(nlcn_msg.proc_ev.event_data.exec.process_pid);
 			if (check(filename, cfg)) {
 				std::cout << "pid: " << filename << std::endl;
-				interface* dbg = gdbInterfacebuild(filename);
-				extern void run_monitor(const string& pid,
-										const std::vector<stream>& streams,
-										interface* dbg);
-				std::thread t(run_monitor, filename, cfg->getStreams(), dbg);
-				t.detach();
+				socketClose sync(-1, false);
+				run_monitor(cfg->getStreams(), filename, cfg->getArguments(),
+							sync);
 			}
 		}
 	}
 }
 
-void watch(config* cfg) {
+void execEventWatch(config* cfg) {
 	int nl_sock = nl_connect();
-
 	if (nl_sock == -1)
 		return;
 
@@ -153,23 +170,79 @@ void watch(config* cfg) {
 	close(nl_sock);
 	return;
 }
-/*
-	while (true) {
-		DIR* dir = opendir("/proc");
-		if (dir == NULL) {
-			perror("opendir");
-			exit(1);
-		}
-		struct dirent* entry;
-		while ((entry = readdir(dir)) != NULL) {
-			if (entry->d_type == DT_DIR && check(entry->d_name, cfg)) {
-				std::cout << "pid: " << entry->d_name << std::endl;
-				extern void run_monitor(const string& pid,
-										const std::vector<stream>& streams);
-				std::thread t(run_monitor, entry->d_name,
-   cfg->getStreams()); t.join(); return;
-			}
-		}
-		closedir(dir);
+
+void cmdRun(config* cfg, const std::vector<string>& argv) {
+	socketClose sync(-1, false);
+	run_monitor(cfg->getStreams(), "", argv, sync);
+	return;
+}
+
+void pidAttach(config* cfg, int pid) {
+	socketClose sync(-1, false);
+	run_monitor(cfg->getStreams(), std::to_string(pid), std::vector<string>(),
+				sync);
+	return;
+}
+
+int port_watch(config* cfg, int port, int max_client) {
+	int sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (sock < 0) {
+		perror("socket");
+		return -1;
 	}
-*/
+
+	struct sockaddr_in addr;
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(port);
+	addr.sin_addr.s_addr = INADDR_ANY;
+	if (bind(sock, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+		perror("bind");
+		return -1;
+	}
+
+	if (listen(sock, max_client) < 0) {
+		perror("listen");
+		return -1;
+	}
+	std::cout << "Listening on port " << port << std::endl;
+
+	while (true) {
+		struct sockaddr_in clientAddress;
+		socklen_t clientAddressLength = sizeof(clientAddress);
+		int client = accept(sock, (struct sockaddr*)&clientAddress,
+							&clientAddressLength);
+		if (client < 0) {
+			perror("accept");
+			return -1;
+		}
+
+		struct {
+			int pid;
+			unsigned magicnumber;
+		} data;
+		if (recv(client, &data, sizeof(data), 0) < 0) {
+			perror("recv");
+			return -1;
+		}
+		if (data.magicnumber != 0xdeadbeef ||
+			!check(std::to_string(data.pid), cfg))
+			continue;
+		socketClose sync(client, true);
+
+		run_monitor(cfg->getStreams(), std::to_string(data.pid),
+					std::vector<string>(), sync);
+
+		// std::cout << "Attaching to pid " << data.pid << std::endl;
+
+		unsigned succ = 0xdeadbeef;
+		if (send(client, &succ, sizeof(succ), 0) < 0) {
+			perror("send");
+			return -1;
+		}
+		// std::cout << "send " << succ << std::endl;
+		close(client);
+		sync.notify();
+	}
+	close(sock);
+	return 0;
+}

@@ -1,0 +1,8 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+Language: Cpp
+DerivePointerAlignment: false
+PointerAlignment: Left
+UseTab: Always
+TabWidth: 4
+AccessModifierOffset: -4

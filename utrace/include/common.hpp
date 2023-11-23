@@ -1,7 +1,10 @@
 #ifndef COMMON_HPP
 #define COMMON_HPP
 
+#include <condition_variable>
+#include <mutex>
 #include <string>
+#include <unistd.h>
 #include <vector>
 
 class data {
@@ -12,10 +15,9 @@ public:
 class interface {
 public:
 	virtual std::string addBreakpoint(const std::string& breakPoint) = 0;
-	virtual std::pair<std::string, std::string>
-	readVar(const std::string& var) = 0;
 	virtual bool continueExec() = 0;
 	virtual std::string currentBreakpointHit() const = 0;
+	virtual std::string expEval(const std::string& exp) = 0;
 };
 
 class breakpointhandler {
@@ -60,6 +62,30 @@ public:
 	std::vector<std::string> getArguments() const { return arguments; }
 	bool chk() const { return filter->check(name); }
 	std::vector<stream> getStreams() const { return streams; }
+};
+
+class socketClose {
+private:
+	std::mutex mutex;
+	std::condition_variable cv;
+	int client_socket;
+	bool ready = false, use;
+
+public:
+	socketClose(int client_socket, bool use)
+		: client_socket(client_socket), use(use) {}
+	void wait() {
+		std::unique_lock<std::mutex> lock(mutex);
+		while (!ready)
+			cv.wait(lock);
+	}
+	bool inuse() { return use; }
+	void notify() {
+		std::unique_lock<std::mutex> lock(mutex);
+		ready = true;
+		cv.notify_all();
+	}
+	void close_all() { close(client_socket); }
 };
 
 #endif
