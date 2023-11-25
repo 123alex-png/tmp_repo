@@ -3,6 +3,6 @@ IndentWidth: 4
 Language: Cpp
 DerivePointerAlignment: false
 PointerAlignment: Left
-UseTab: Always
+UseTab: Never
 TabWidth: 4
 AccessModifierOffset: -4

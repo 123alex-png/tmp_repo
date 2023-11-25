@@ -4,11 +4,11 @@
 #include "common-config.hpp"
 
 config* dummy() {
-	vector<string> args{"a.out"};
-	vector<stream> streams;
-	streams.push_back(
-		stream("break1", "a.cpp:10", new simpleBreakpointHandler({"x", "y"})));
-	return new config("a.out", args, new simpleProcessFilter(), streams);
+    vector<string> args{"a.out"};
+    vector<stream> streams;
+    streams.push_back(
+        stream("break1", "a.cpp:10", new simpleBreakpointHandler({"x", "y"})));
+    return new config("a.out", args, new simpleProcessFilter(), streams);
 }
 
 #endif
