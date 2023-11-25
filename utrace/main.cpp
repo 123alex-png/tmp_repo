@@ -15,10 +15,11 @@ int main(int argc, const char* argv[]) {
     std::vector<std::string> exec;
 
     desc.add_options()("help", "produce help message")(
-        "config", po::value<std::string>(&config_file), "set config file")(
-        "exec", po::value<std::vector<std::string>>(&exec), "set run command")(
-        "pid", po::value<int>(&pid), "set pid to be watched")(
-        "port,p", po::value<int>(&port), "set port to be listened");
+        "config,c", po::value<std::string>(&config_file),
+        "set config file")("exec,e", po::value<std::vector<std::string>>(&exec),
+                           "set run command")("pid,p", po::value<int>(&pid),
+                                              "set pid to be watched")(
+        "port,l", po::value<int>(&port), "set port to be listened");
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
