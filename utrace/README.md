@@ -67,8 +67,3 @@ TODO
 ## Troubleshooting
 
 TODO
-
-## Note
-
-This README file has been modified from the original production of the AI assistant.
-
