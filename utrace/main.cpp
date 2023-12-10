@@ -45,7 +45,9 @@ int main(int argc, const char* argv[]) {
     if (vm.count("port")) {
         std::cout << "Port: " << port << std::endl;
     }
-    config* cfg = simpleConfigInitialize(config_file);
+    config* cfg = nullptr;
+    if(!config_file.empty()) 
+        cfg = simpleConfigInitialize(config_file);
     if (pid != 0) {
         pidAttach(cfg, pid);
     } else if (port != 0) {

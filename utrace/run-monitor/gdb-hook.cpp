@@ -84,7 +84,7 @@ public:
             std::getline(gdbOutput, output);
             // std::cout << "GDB output: " << output << std::endl;
         }
-        std::cout << command << std::endl;
+        // std::cout << command << std::endl;
     }
 
     ~gdbInterface() {

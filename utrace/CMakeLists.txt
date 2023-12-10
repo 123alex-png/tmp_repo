@@ -9,6 +9,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 # Add include directories
 include_directories(include)
+include_directories(third-party)
 
 # Find Boost libraries
 find_package(Boost REQUIRED COMPONENTS program_options)
@@ -32,11 +33,12 @@ add_executable(simpleAttach ${SOURCES})
 # Link Boost libraries
 target_link_libraries(simpleAttach Boost::program_options Threads::Threads)
 
-# Run clang-format on all .cpp and .h files in the project
+# Run clang-format on all .cpp and .hpp files in the project
 file(GLOB_RECURSE ALL_SOURCE_FILES
-    "${CMAKE_SOURCE_DIR}/*.cpp"
-    "${CMAKE_SOURCE_DIR}/*.h"
-)
+    ${CMAKE_SOURCE_DIR}/include/*.hpp
+    ${SRC_FOLDERS}/*.cpp
+    ${SRC_FOLDERS}/*.hpp
+) 
 
 add_custom_target(
     clang-format

@@ -1,5 +1,6 @@
 #include <arpa/inet.h>
 #include <cstring>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <netinet/in.h>
@@ -7,9 +8,13 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <watch.hpp>
+#include <nlohmann/json.hpp>
 
 using std::string;
 bool check(string filename, config* cfg) {
+    if(!cfg)
+        return true;
+
     static char buf[1024];
 
     FILE* fp = fopen(("/proc/" + filename + "/comm").c_str(), "r");
@@ -53,6 +58,30 @@ bool check(string filename, config* cfg) {
         return false;
 
     return true;
+}
+
+void cmdline_gen(const string& pid) {
+    using json = nlohmann::json;
+    json j;
+    j["pid"] = pid;
+    j["time"] = std::time(nullptr);
+
+//    std::cout << std::endl<< "Generating cmdline for " << pid << " at "<< std::ctime(new time_t);
+    std::ifstream file("/proc/" + pid + "/cmdline");
+    std::vector<string> arguments;
+    if (file.is_open()) {
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        // output all the command line
+        std::string cmdline = buffer.str();
+        std::istringstream iss(cmdline);
+        std::string argument;
+        while (getline(iss, argument, '\0')) {
+            arguments.push_back(argument);
+        }
+    }
+    j["cmdline"] = arguments;
+    std::cout << j.dump() << std::endl;
 }
 
 int port_watch(config* cfg, int port, int max_client) {
@@ -109,9 +138,12 @@ int port_watch(config* cfg, int port, int max_client) {
             continue;
         }
 
+        cmdline_gen(std::to_string(data.pid));
+
         socketClose sync(client, true);
 
-        run_monitor(cfg->getStreams(), std::to_string(data.pid),
+        if(cfg) 
+            run_monitor(cfg->getStreams(), std::to_string(data.pid),
                     std::vector<string>(), sync);
 
         // std::cout << "Attaching to pid " << data.pid << std::endl;
