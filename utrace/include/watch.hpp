@@ -9,6 +9,6 @@ bool check(std::string filename, config* cfg);
 void execEventWatch(config*);
 void cmdRun(config*, const std::vector<std::string>&);
 void pidAttach(config*, int);
-int port_watch(config*, int, int);
+int port_watch(config*, const std::string&, int, int);
 
 #endif

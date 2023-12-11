@@ -12,14 +12,16 @@ int main(int argc, const char* argv[]) {
 
     int pid = 0, port = 0;
     std::string config_file = "";
+    std::string output_file = "";
     std::vector<std::string> exec;
 
-    desc.add_options()("help", "produce help message")(
-        "config,c", po::value<std::string>(&config_file),
-        "set config file")("exec,e", po::value<std::vector<std::string>>(&exec),
-                           "set run command")("pid,p", po::value<int>(&pid),
-                                              "set pid to be watched")(
-        "port,l", po::value<int>(&port), "set port to be listened");
+    desc.add_options()
+        ("help", "produce help message")
+        ("config,c", po::value<std::string>(&config_file),"set config file")
+        ("exec,e", po::value<std::vector<std::string>>(&exec),"set run command")
+        ("pid,p", po::value<int>(&pid), "set pid to be watched")
+        ("port,l", po::value<int>(&port), "set port to be listened")
+        ("output,o", po::value<std::string>(&output_file), "set output file");
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -45,13 +47,16 @@ int main(int argc, const char* argv[]) {
     if (vm.count("port")) {
         std::cout << "Port: " << port << std::endl;
     }
+    if (vm.count("output")) {
+        std::cout << "Output: " << output_file << std::endl;
+    }
     config* cfg = nullptr;
     if(!config_file.empty()) 
         cfg = simpleConfigInitialize(config_file);
     if (pid != 0) {
         pidAttach(cfg, pid);
     } else if (port != 0) {
-        port_watch(cfg, port, 1);
+        port_watch(cfg, output_file, port, 1);
     } else if (!exec.empty()) {
         cmdRun(cfg, exec);
     } else {

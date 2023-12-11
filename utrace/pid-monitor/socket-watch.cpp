@@ -60,11 +60,7 @@ bool check(string filename, config* cfg) {
     return true;
 }
 
-void cmdline_gen(const string& pid) {
-    using json = nlohmann::json;
-    json j;
-    j["pid"] = pid;
-    j["time"] = std::time(nullptr);
+void cmdline_gen(const string& pid, const string& outputFile) {
 
 //    std::cout << std::endl<< "Generating cmdline for " << pid << " at "<< std::ctime(new time_t);
     std::ifstream file("/proc/" + pid + "/cmdline");
@@ -80,11 +76,19 @@ void cmdline_gen(const string& pid) {
             arguments.push_back(argument);
         }
     }
+    using json = nlohmann::json;
+    json j;
     j["cmdline"] = arguments;
-    std::cout << j.dump() << std::endl;
+    j["time"] = std::time(nullptr);
+    if(!outputFile.empty()) {
+        std::ofstream o(outputFile, std::ios::app);
+        o << j.dump() << std::endl;
+    } else {
+        std::cout << j.dump() << std::endl;
+    }
 }
 
-int port_watch(config* cfg, int port, int max_client) {
+int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
         perror("socket");
@@ -138,7 +142,7 @@ int port_watch(config* cfg, int port, int max_client) {
             continue;
         }
 
-        cmdline_gen(std::to_string(data.pid));
+        cmdline_gen(std::to_string(data.pid), outputFile);
 
         socketClose sync(client, true);
 
