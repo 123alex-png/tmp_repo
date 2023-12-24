@@ -90,9 +90,10 @@ void cmdline_gen(const string& pid, const string& outputFile) {
 }
 
 static string filepath = "/tmp/pid-monitor";
+static int recv_signal = 0;
 
 void on_exit() {
-    remove(filepath.c_str());
+    if(!recv_signal) remove(filepath.c_str());
 }
 
 int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
@@ -126,9 +127,9 @@ int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
     o.close();
     atexit(on_exit);
     at_quick_exit(on_exit);
-    signal(SIGINT, [](int) { exit(0); });
-    signal(SIGTERM, [](int) { exit(0); });
-    signal(SIGKILL, [](int) { exit(0); });
+    signal(SIGINT, [](int x) { recv_signal = x; on_exit(); });
+    signal(SIGTERM, [](int x) { recv_signal = x; on_exit(); });
+    signal(SIGKILL, [](int x) { recv_signal = x; on_exit(); });
 
     std::cout << "Listening on port " << port << std::endl;
 
@@ -181,6 +182,7 @@ int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
         // std::cout << "send " << succ << std::endl;
         close(client);
         sync.notify();
+        if(recv_signal) exit(0);
     }
     close(sock);
     return 0;
