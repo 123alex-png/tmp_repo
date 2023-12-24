@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <watch.hpp>
 #include <nlohmann/json.hpp>
+#include <signal.h>
 
 using std::string;
 bool check(string filename, config* cfg) {
@@ -88,6 +89,12 @@ void cmdline_gen(const string& pid, const string& outputFile) {
     }
 }
 
+static string filepath = "/tmp/pid-monitor";
+
+void on_exit() {
+    remove(filepath.c_str());
+}
+
 int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
@@ -110,7 +117,6 @@ int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
         return -1;
     }
 
-    string filepath = "/tmp/pid-monitor";
     std::ofstream o(filepath, std::ios::out);
     if (!o.is_open()) {
         perror("open");
@@ -118,6 +124,11 @@ int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
     }
     o << port << std::endl;
     o.close();
+    atexit(on_exit);
+    at_quick_exit(on_exit);
+    signal(SIGINT, [](int) { exit(0); });
+    signal(SIGTERM, [](int) { exit(0); });
+    signal(SIGKILL, [](int) { exit(0); });
 
     std::cout << "Listening on port " << port << std::endl;
 
