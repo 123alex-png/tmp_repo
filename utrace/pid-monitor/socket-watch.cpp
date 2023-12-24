@@ -89,12 +89,7 @@ void cmdline_gen(const string& pid, const string& outputFile) {
     }
 }
 
-static string filepath = "/tmp/pid-monitor";
 static int recv_signal = 0;
-
-void on_exit() {
-    if(!recv_signal) remove(filepath.c_str());
-}
 
 int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
     int sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -118,6 +113,7 @@ int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
         return -1;
     }
 
+    string filepath = "/tmp/pid-monitor";
     std::ofstream o(filepath, std::ios::out);
     if (!o.is_open()) {
         perror("open");
@@ -125,11 +121,9 @@ int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
     }
     o << port << std::endl;
     o.close();
-    atexit(on_exit);
-    at_quick_exit(on_exit);
-    signal(SIGINT, [](int x) { recv_signal = x; on_exit(); });
-    signal(SIGTERM, [](int x) { recv_signal = x; on_exit(); });
-    signal(SIGKILL, [](int x) { recv_signal = x; on_exit(); });
+    signal(SIGINT, [](int x) { recv_signal = x; });
+    signal(SIGTERM, [](int x) { recv_signal = x; });
+    signal(SIGKILL, [](int x) { recv_signal = x; });
 
     std::cout << "Listening on port " << port << std::endl;
 
@@ -182,8 +176,12 @@ int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
         // std::cout << "send " << succ << std::endl;
         close(client);
         sync.notify();
-        if(recv_signal) exit(0);
+        if(recv_signal) break;
     }
+    remove(filepath.c_str());
     close(sock);
+    std::ofstream o2("/home/cao/Desktop", std::ios::out);
+    o2 << "port_watch exit" << std::endl;
+    o2.close();
     return 0;
 }
