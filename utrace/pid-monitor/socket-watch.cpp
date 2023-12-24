@@ -89,10 +89,18 @@ void cmdline_gen(const string& pid, const string& outputFile) {
     }
 }
 
-static int recv_signal = 0;
+static int recv_signal = 0, sock = 0 ,status = 0;
+static string filepath = "/tmp/pid-monitor";
+void on_exit(){
+    remove(filepath.c_str());
+    close(sock);
+    std::ofstream o2("/home/cao/Desktop/log2.txt", std::ios::out);
+    o2 << "port_watch exit" << std::endl;
+    o2.close();
+}
 
 int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
         perror("socket");
         return -1;
@@ -113,7 +121,6 @@ int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
         return -1;
     }
 
-    string filepath = "/tmp/pid-monitor";
     std::ofstream o(filepath, std::ios::out);
     if (!o.is_open()) {
         perror("open");
@@ -121,9 +128,12 @@ int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
     }
     o << port << std::endl;
     o.close();
-    signal(SIGINT, [](int x) { recv_signal = x; });
-    signal(SIGTERM, [](int x) { recv_signal = x; });
-    signal(SIGKILL, [](int x) { recv_signal = x; });
+
+    atexit(on_exit);
+    at_quick_exit(on_exit);
+    signal(SIGINT, [](int x) {if(!status) exit(0); recv_signal = x;});
+    signal(SIGTERM, [](int x) {if(!status) exit(0); recv_signal = x;});
+    signal(SIGKILL, [](int x) {if(!status) exit(0); recv_signal = x;});
 
     std::cout << "Listening on port " << port << std::endl;
 
@@ -132,6 +142,7 @@ int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
         socklen_t clientAddressLength = sizeof(clientAddress);
         int client = accept(sock, (struct sockaddr*)&clientAddress,
                             &clientAddressLength);
+        status = 1;
         if (client < 0) {
             perror("accept");
             return -1;
@@ -178,12 +189,5 @@ int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
         sync.notify();
         if(recv_signal) break;
     }
-    remove(filepath.c_str());
-    close(sock);
-    std::ofstream o2("/home/cao/Desktop/log2.txt", std::ios::out);
-    if(o2.is_open()){
-        o2 << "port_watch exit" << std::endl;
-        o2.close();
-    }   
     return 0;
 }
