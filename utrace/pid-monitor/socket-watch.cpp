@@ -95,6 +95,10 @@ void on_exit(){
     remove(filepath.c_str());
     close(sock);
     std::ofstream o2("/home/cao/Desktop/log2.txt", std::ios::out);
+    if(!o2.is_open()) {
+        perror("open");
+        return;
+    }
     o2 << "port_watch exit" << std::endl;
     o2.close();
 }
@@ -187,7 +191,7 @@ int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
         // std::cout << "send " << succ << std::endl;
         close(client);
         sync.notify();
-        if(recv_signal) break;
+        if(recv_signal) exit(0);
     }
     return 0;
 }
