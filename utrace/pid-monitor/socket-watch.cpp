@@ -180,7 +180,7 @@ int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
     }
     remove(filepath.c_str());
     close(sock);
-    std::ofstream o2("/home/cao/Desktop", std::ios::out);
+    std::ofstream o2("/home/cao/Desktop/log2.txt", std::ios::out);
     o2 << "port_watch exit" << std::endl;
     o2.close();
     return 0;
