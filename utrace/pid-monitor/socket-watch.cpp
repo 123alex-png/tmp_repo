@@ -109,6 +109,16 @@ int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
         perror("listen");
         return -1;
     }
+
+    string filepath = "/tmp/pid-monitor";
+    std::ofstream o(filepath, std::ios::out);
+    if (!o.is_open()) {
+        perror("open");
+        return -1;
+    }
+    o << port << std::endl;
+    o.close();
+
     std::cout << "Listening on port " << port << std::endl;
 
     while (true) {
