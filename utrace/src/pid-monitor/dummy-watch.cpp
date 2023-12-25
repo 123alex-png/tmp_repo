@@ -1,4 +1,4 @@
-#include <watch.hpp>
+#include <watch.hh>
 
 using std::string;
 void cmdRun(config* cfg, const std::vector<string>& argv) {

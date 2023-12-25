@@ -1,7 +1,7 @@
 #ifndef COMMON_CONFIG_HPP
 #define COMMON_CONFIG_HPP
 
-#include <common.hpp>
+#include <common.hh>
 #include <ctime>
 #include <iostream>
 

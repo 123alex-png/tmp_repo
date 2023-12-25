@@ -12,8 +12,7 @@ config* tarFile() {
                              new simpleBreakpointHandler({"pathname", "ret"})));
     streams.push_back(stream("open3_or_warn", "xfuncs_printf.c:166",
                              new simpleBreakpointHandler({"pathname", "ret"})));
-    return new config("tar", args, new simpleProcessFilter(),
-                      streams);
+    return new config("tar", args, new simpleProcessFilter(), streams);
 }
 
 #endif

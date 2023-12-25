@@ -1,8 +1,8 @@
 #include <boost/program_options.hpp>
 #include <cassert>
-#include <common.hpp>
+#include <common.hh>
 #include <iostream>
-#include <watch.hpp>
+#include <watch.hh>
 
 config* simpleConfigInitialize(std::string config_file);
 int main(int argc, const char* argv[]) {
@@ -15,13 +15,13 @@ int main(int argc, const char* argv[]) {
     std::string output_file = "";
     std::vector<std::string> exec;
 
-    desc.add_options()
-        ("help", "produce help message")
-        ("config,c", po::value<std::string>(&config_file),"set config file")
-        ("exec,e", po::value<std::vector<std::string>>(&exec),"set run command")
-        ("pid,p", po::value<int>(&pid), "set pid to be watched")
-        ("port,l", po::value<int>(&port), "set port to be listened")
-        ("output,o", po::value<std::string>(&output_file), "set output file");
+    desc.add_options()("help", "produce help message")(
+        "config,c", po::value<std::string>(&config_file),
+        "set config file")("exec,e", po::value<std::vector<std::string>>(&exec),
+                           "set run command")("pid,p", po::value<int>(&pid),
+                                              "set pid to be watched")(
+        "port,l", po::value<int>(&port), "set port to be listened")(
+        "output,o", po::value<std::string>(&output_file), "set output file");
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -51,7 +51,7 @@ int main(int argc, const char* argv[]) {
         std::cout << "Output: " << output_file << std::endl;
     }
     config* cfg = nullptr;
-    if(!config_file.empty()) 
+    if (!config_file.empty())
         cfg = simpleConfigInitialize(config_file);
     if (pid != 0) {
         pidAttach(cfg, pid);

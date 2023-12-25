@@ -1,7 +1,7 @@
-#ifndef WATCH_HPP
-#define WATCH_HPP
+#ifndef WATCH_HH
+#define WATCH_HH
 
-#include <common.hpp>
+#include <common.hh>
 void run_monitor(const std::vector<stream>& streams, const std::string& pid,
                  const std::vector<std::string>& argv, socketClose& sync);
 bool check(std::string filename, config* cfg);

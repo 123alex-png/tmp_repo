@@ -4,16 +4,16 @@
 #include <fstream>
 #include <iostream>
 #include <netinet/in.h>
+#include <nlohmann/json.hpp>
+#include <signal.h>
 #include <sstream>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <watch.hpp>
-#include <nlohmann/json.hpp>
-#include <signal.h>
+#include <watch.hh>
 
 using std::string;
 bool check(string filename, config* cfg) {
-    if(!cfg)
+    if (!cfg)
         return true;
 
     static char buf[1024];
@@ -63,7 +63,8 @@ bool check(string filename, config* cfg) {
 
 void cmdline_gen(const string& pid, const string& outputFile) {
 
-//    std::cout << std::endl<< "Generating cmdline for " << pid << " at "<< std::ctime(new time_t);
+    //    std::cout << std::endl<< "Generating cmdline for " << pid << " at "<<
+    //    std::ctime(new time_t);
     std::ifstream file("/proc/" + pid + "/cmdline");
     std::vector<string> arguments;
     if (file.is_open()) {
@@ -81,7 +82,7 @@ void cmdline_gen(const string& pid, const string& outputFile) {
     json j;
     j["cmdline"] = arguments;
     j["time"] = std::time(nullptr);
-    if(!outputFile.empty()) {
+    if (!outputFile.empty()) {
         std::ofstream o(outputFile, std::ios::app);
         o << j.dump() << std::endl;
     } else {
@@ -89,13 +90,13 @@ void cmdline_gen(const string& pid, const string& outputFile) {
     }
 }
 
-static int recv_signal = 0, sock = 0 ,status = 0;
+static int recv_signal = 0, sock = 0, status = 0;
 static string filepath = "/tmp/pid-monitor";
-void on_exit(){
+void on_exit() {
     remove(filepath.c_str());
     close(sock);
     std::ofstream o2("/home/cao/Desktop/log2.txt", std::ios::out);
-    if(!o2.is_open()) {
+    if (!o2.is_open()) {
         perror("open");
         return;
     }
@@ -103,7 +104,8 @@ void on_exit(){
     o2.close();
 }
 
-int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
+int port_watch(config* cfg, const string& outputFile, int port,
+               int max_client) {
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
         perror("socket");
@@ -135,9 +137,21 @@ int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
 
     atexit(on_exit);
     at_quick_exit(on_exit);
-    signal(SIGINT, [](int x) {if(!status) exit(0); recv_signal = x;});
-    signal(SIGTERM, [](int x) {if(!status) exit(0); recv_signal = x;});
-    signal(SIGKILL, [](int x) {if(!status) exit(0); recv_signal = x;});
+    signal(SIGINT, [](int x) {
+        if (!status)
+            exit(0);
+        recv_signal = x;
+    });
+    signal(SIGTERM, [](int x) {
+        if (!status)
+            exit(0);
+        recv_signal = x;
+    });
+    signal(SIGKILL, [](int x) {
+        if (!status)
+            exit(0);
+        recv_signal = x;
+    });
 
     std::cout << "Listening on port " << port << std::endl;
 
@@ -177,9 +191,9 @@ int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
 
         socketClose sync(client, true);
 
-        if(cfg) 
+        if (cfg)
             run_monitor(cfg->getStreams(), std::to_string(data.pid),
-                    std::vector<string>(), sync);
+                        std::vector<string>(), sync);
 
         // std::cout << "Attaching to pid " << data.pid << std::endl;
 
@@ -191,7 +205,8 @@ int port_watch(config* cfg, const string &outputFile,int port, int max_client) {
         // std::cout << "send " << succ << std::endl;
         close(client);
         sync.notify();
-        if(recv_signal) exit(0);
+        if (recv_signal)
+            exit(0);
     }
     return 0;
 }

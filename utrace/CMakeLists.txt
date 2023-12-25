@@ -15,17 +15,9 @@ include_directories(third-party)
 find_package(Boost REQUIRED COMPONENTS program_options)
 find_package(Threads REQUIRED)
 
-# Get all .cpp files in the project
-set(SRC_FOLDERS 
-    ${CMAKE_SOURCE_DIR}/initialize
-    ${CMAKE_SOURCE_DIR}/pid-monitor
-    ${CMAKE_SOURCE_DIR}/run-monitor
-)
-file(GLOB_RECURSE SOURCES "main.cpp")
-foreach(SRC_FOLDER ${SRC_FOLDERS})
-    file(GLOB_RECURSE FILES "${SRC_FOLDER}/*.cpp")
-    set(SOURCES ${SOURCES} ${FILES})
-endforeach()
+# Get all .cpp files in the /src folder
+
+file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
 # Create the executable
 add_executable(simpleAttach ${SOURCES})
@@ -36,9 +28,15 @@ target_link_libraries(simpleAttach Boost::program_options Threads::Threads)
 # Run clang-format on all .cpp and .hpp files in the project
 file(GLOB_RECURSE ALL_SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/include/*.hpp
-    ${SRC_FOLDERS}/*.cpp
-    ${SRC_FOLDERS}/*.hpp
+    ${SOURCES}
+    ${CMAKE_SOURCE_DIR}/src/*.hpp
 ) 
+
+file(GLOB_RECURSE LIB_SOURCES
+    ${CMAKE_SOURCE_DIR}/library/*.cpp
+)
+
+add_library(simpleAttachLib ${LIB_SOURCES})
 
 add_custom_target(
     clang-format
@@ -47,7 +45,18 @@ add_custom_target(
     -i
     ${ALL_SOURCE_FILES}
 )
+
+add_custom_target(
+    clang-format-lib
+    COMMAND clang-format
+    -style=file
+    -i
+    ${LIB_SOURCES}
+)
+
 add_dependencies(simpleAttach clang-format)
+add_dependencies(simpleAttachLib clang-format-lib)
+target_link_options(simpleAttachLib PRIVATE -static)
 
 # clean up
 add_custom_target(

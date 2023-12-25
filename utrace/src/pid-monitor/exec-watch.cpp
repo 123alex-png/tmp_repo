@@ -1,4 +1,4 @@
-#include <common.hpp>
+#include <common.hh>
 #include <cstring>
 #include <iostream>
 #include <linux/cn_proc.h>
@@ -8,7 +8,7 @@
 #include <sys/procfs.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <watch.hpp>
+#include <watch.hh>
 
 using std::string;
 
