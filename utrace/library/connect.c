@@ -1,11 +1,11 @@
-#include <filesystem>
-#include <iostream>
 #include <netinet/in.h>
+#include <stdio.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
 void start_client() {
-    if (!std::filesystem::exists("/tmp//tmp/pid-monitor"))
+    printf("start client\n");
+    if (!access("/tmp/pid-monitor", F_OK))
         return;
     int port = 1145;
     // Create socket for client

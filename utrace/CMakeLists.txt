@@ -33,10 +33,12 @@ file(GLOB_RECURSE ALL_SOURCE_FILES
 ) 
 
 file(GLOB_RECURSE LIB_SOURCES
-    ${CMAKE_SOURCE_DIR}/library/*.cpp
+    ${CMAKE_SOURCE_DIR}/library/*.c
 )
 
-add_library(simpleAttachLib ${LIB_SOURCES})
+add_library(simpleAttachLib OBJECT ${LIB_SOURCES})
+
+set_target_properties(simpleAttachLib PROPERTIES OUTPUT_NAME simpleAttachLib.o)
 
 add_custom_target(
     clang-format
