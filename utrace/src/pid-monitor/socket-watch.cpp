@@ -140,16 +140,19 @@ int port_watch(config* cfg, const string& outputFile, int port,
     signal(SIGINT, [](int x) {
         if (!status)
             exit(0);
+        remove(filepath.c_str());
         recv_signal = x;
     });
     signal(SIGTERM, [](int x) {
         if (!status)
             exit(0);
+        remove(filepath.c_str());
         recv_signal = x;
     });
     signal(SIGKILL, [](int x) {
         if (!status)
             exit(0);
+        remove(filepath.c_str());
         recv_signal = x;
     });
 
@@ -207,6 +210,7 @@ int port_watch(config* cfg, const string& outputFile, int port,
         sync.notify();
         if (recv_signal)
             exit(0);
+        status = 0;
     }
     return 0;
 }
