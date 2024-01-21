@@ -12,7 +12,7 @@ int unixDomainSocketWatch(config* cfg, const string& outputFile,
     int sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
     if (sockfd == -1) {
         std::cerr << "Failed to create socket." << std::endl;
-        return 1;
+        return -1;
     }
 
     // Create the directory if it does not exist
@@ -20,7 +20,7 @@ int unixDomainSocketWatch(config* cfg, const string& outputFile,
     int status = mkdir(directoryPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     if (status != 0 && errno != EEXIST) {
         std::cout << "Failed to create directory!" << std::endl;
-        return 1;
+        return -1;
     }
 
     // Specify the socket address
@@ -33,14 +33,14 @@ int unixDomainSocketWatch(config* cfg, const string& outputFile,
         -1) {
         std::cerr << "Failed to bind socket to address." << std::endl;
         close(sockfd);
-        return 1;
+        return -1;
     }
 
     // Listen for incoming connections
     if (listen(sockfd, 5) == -1) {
         std::cerr << "Failed to listen for connections." << std::endl;
         close(sockfd);
-        return 1;
+        return -1;
     }
 
     return sockfd;
