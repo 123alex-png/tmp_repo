@@ -1,8 +1,9 @@
 #include <common.hh>
+#include <fcntl.h>
 #include <iostream>
 #include <sys/socket.h>
-#include <sys/un.h>
 #include <sys/stat.h>
+#include <sys/un.h>
 #include <unistd.h>
 
 using std::string;
@@ -17,7 +18,8 @@ int unixDomainSocketWatch(config* cfg, const string& outputFile,
 
     // Create the directory if it does not exist
     std::string directoryPath = file.substr(0, file.find_last_of('/'));
-    int status = mkdir(directoryPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    int status =
+        mkdir(directoryPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     if (status != 0 && errno != EEXIST) {
         std::cout << "Failed to create directory!" << std::endl;
         return -1;
@@ -32,6 +34,13 @@ int unixDomainSocketWatch(config* cfg, const string& outputFile,
     if (bind(sockfd, reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr)) ==
         -1) {
         std::cerr << "Failed to bind socket to address." << std::endl;
+        close(sockfd);
+        return -1;
+    }
+
+    // Set appropriate permissions for the socket file
+    if (chmod(addr.sun_path, 0666) == -1) {
+        std::cerr << "Failed to set socket file permissions." << std::endl;
         close(sockfd);
         return -1;
     }
