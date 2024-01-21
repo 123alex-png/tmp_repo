@@ -20,7 +20,7 @@ int unixDomainSocketWatch(config* cfg, const string& outputFile,
     int status = mkdir(directoryPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     if (status != 0 && errno != EEXIST) {
         std::cout << "Failed to create directory!" << std::endl;
-        return;
+        return 1;
     }
 
     // Specify the socket address
