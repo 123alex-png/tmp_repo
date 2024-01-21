@@ -12,34 +12,34 @@
 
 using std::string;
 
-static int nl_connect() {
+static int nlConnect() {
     int rc;
-    int nl_sock;
+    int nlSock;
     struct sockaddr_nl sa_nl;
 
-    nl_sock = socket(PF_NETLINK, SOCK_DGRAM, NETLINK_CONNECTOR);
-    if (nl_sock == -1) {
+    nlSock = socket(PF_NETLINK, SOCK_DGRAM, NETLINK_CONNECTOR);
+    if (nlSock == -1) {
         perror("socket");
         return -1;
     }
     int bufferSize = 4 * 1024 * 1024; // 4MB
-    setsockopt(nl_sock, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
+    setsockopt(nlSock, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
 
     sa_nl.nl_family = AF_NETLINK;
     sa_nl.nl_groups = CN_IDX_PROC;
     sa_nl.nl_pid = getpid();
 
-    rc = bind(nl_sock, (struct sockaddr*)&sa_nl, sizeof(sa_nl));
+    rc = bind(nlSock, (struct sockaddr*)&sa_nl, sizeof(sa_nl));
     if (rc == -1) {
         perror("bind");
-        close(nl_sock);
+        close(nlSock);
         return -1;
     }
 
-    return nl_sock;
+    return nlSock;
 }
 
-static int set_proc_ev_listen(int nl_sock, bool enable) {
+static int setProcEvListen(int nlSock, bool enable) {
     int rc;
     struct __attribute__((aligned(NLMSG_ALIGNTO))) {
         struct nlmsghdr nl_hdr;
@@ -60,7 +60,7 @@ static int set_proc_ev_listen(int nl_sock, bool enable) {
 
     nlcn_msg.cn_mcast = enable ? PROC_CN_MCAST_LISTEN : PROC_CN_MCAST_IGNORE;
 
-    rc = send(nl_sock, &nlcn_msg, sizeof(nlcn_msg), 0);
+    rc = send(nlSock, &nlcn_msg, sizeof(nlcn_msg), 0);
     if (rc == -1) {
         perror("netlink send");
         return -1;
@@ -69,7 +69,7 @@ static int set_proc_ev_listen(int nl_sock, bool enable) {
     return 0;
 }
 
-static int handle_proc_ev(int nl_sock, config* cfg) {
+static int handleProcEv(int nlSock, config* cfg) {
     int rc;
     struct __attribute__((aligned(NLMSG_ALIGNTO))) {
         struct nlmsghdr nl_hdr;
@@ -80,7 +80,7 @@ static int handle_proc_ev(int nl_sock, config* cfg) {
     } nlcn_msg;
 
     while (true) {
-        rc = recv(nl_sock, &nlcn_msg, sizeof(nlcn_msg), 0);
+        rc = recv(nlSock, &nlcn_msg, sizeof(nlcn_msg), 0);
         if (rc == 0) {
             /* shutdown? */
             return 0;
@@ -94,28 +94,28 @@ static int handle_proc_ev(int nl_sock, config* cfg) {
             if (check(filename, cfg)) {
                 std::cout << "pid: " << filename << std::endl;
                 socketClose sync(-1, false);
-                run_monitor(cfg->getStreams(), filename, cfg->getArguments(),
-                            sync);
+                runMonitor(cfg->getStreams(), filename, cfg->getArguments(),
+                           sync);
             }
         }
     }
 }
 
 void execEventWatch(config* cfg) {
-    int nl_sock = nl_connect();
+    int nl_sock = nlConnect();
     if (nl_sock == -1)
         return;
 
-    if (set_proc_ev_listen(nl_sock, true) < 0) {
+    if (setProcEvListen(nl_sock, true) < 0) {
         close(nl_sock);
         return;
     }
 
-    if (handle_proc_ev(nl_sock, cfg) < 0) {
+    if (handleProcEv(nl_sock, cfg) < 0) {
         close(nl_sock);
         return;
     }
-    set_proc_ev_listen(nl_sock, false);
+    setProcEvListen(nl_sock, false);
     close(nl_sock);
     return;
 }

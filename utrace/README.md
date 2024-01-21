@@ -1,6 +1,6 @@
-# SimpleAttach
+# Utrace
 
-SimpleAttach is a project that uses gdb to hook processes and generate logs.
+Utrace is a project that aims to provide a platform for data generation for UOS.
 
 ## Table of Contents
 
@@ -15,14 +15,14 @@ SimpleAttach is a project that uses gdb to hook processes and generate logs.
 
 ## Installation
 
-To install SimpleAttach, follow these steps:
+To install utrace, follow these steps:
 
 1. Run `cmake .` in the project directory.
 2. Run `make` to generate the executable file.
 
 ## Usage
 
-SimpleAttach provides the following options:
+utrace provides the following options:
 
 - `--config, -c [filename]`: Specifies the config file (Now simplified as a number for target config).
 
@@ -37,10 +37,10 @@ The process uses pid first, followed by exec, and then port. When nothing is inp
 Example usage:
 
 ```
-./simpleAttach --config 1 --pid 1234
-./simpleAttach --config 2 --exec ./myProgram 
-./simpleAttach --config 3 --port 1145
-./simpleAttach --config 3
+./utrace --config 1 --pid 1234
+./utrace --config 2 --exec ./myProgram 
+./utrace --config 3 --port 1145
+./utrace --config 3
 ```
 
 

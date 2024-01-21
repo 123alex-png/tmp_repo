@@ -10,18 +10,19 @@ int main(int argc, const char* argv[]) {
     namespace po = boost::program_options;
     po::options_description desc("Allowed options");
 
-    int pid = 0, port = 0;
-    std::string config_file = "";
-    std::string output_file = "";
+    int pid = 0;
+    std::string portFile = "";
+    std::string configFile = "";
+    std::string outputFile = "";
     std::vector<std::string> exec;
 
     desc.add_options()("help", "produce help message")(
-        "config,c", po::value<std::string>(&config_file),
+        "config,c", po::value<std::string>(&configFile),
         "set config file")("exec,e", po::value<std::vector<std::string>>(&exec),
                            "set run command")("pid,p", po::value<int>(&pid),
                                               "set pid to be watched")(
-        "port,l", po::value<int>(&port), "set port to be listened")(
-        "output,o", po::value<std::string>(&output_file), "set output file");
+        "port,l", po::value<std::string>(&portFile), "set port to be listened")(
+        "output,o", po::value<std::string>(&outputFile), "set output file");
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -32,7 +33,7 @@ int main(int argc, const char* argv[]) {
         return 1;
     }
     if (vm.count("config")) {
-        std::cout << "Config file: " << config_file << std::endl;
+        std::cout << "Config file: " << configFile << std::endl;
     }
     if (vm.count("exec")) {
         std::cout << "Exec: ";
@@ -45,18 +46,18 @@ int main(int argc, const char* argv[]) {
         std::cout << "Pid: " << pid << std::endl;
     }
     if (vm.count("port")) {
-        std::cout << "Port: " << port << std::endl;
+        std::cout << "Port: " << portFile << std::endl;
     }
     if (vm.count("output")) {
-        std::cout << "Output: " << output_file << std::endl;
+        std::cout << "Output: " << outputFile << std::endl;
     }
     config* cfg = nullptr;
-    if (!config_file.empty())
-        cfg = simpleConfigInitialize(config_file);
+    if (!configFile.empty())
+        cfg = simpleConfigInitialize(configFile);
     if (pid != 0) {
         pidAttach(cfg, pid);
-    } else if (port != 0) {
-        port_watch(cfg, output_file, port, 1);
+    } else if (!portFile.empty()) {
+        portWatch(cfg, outputFile, portFile, 1);
     } else if (!exec.empty()) {
         cmdRun(cfg, exec);
     } else {

@@ -9,8 +9,8 @@ using std::string;
 extern interface* gdbInterfacebuild(const string& pid,
                                     const std::vector<string>& argv);
 
-void run_monitor(const std::vector<stream>& streams, const string& pid,
-                 const std::vector<string>& argv, socketClose& sync) {
+void runMonitor(const std::vector<stream>& streams, const string& pid,
+                const std::vector<string>& argv, socketClose& sync) {
     std::mutex mutex;
     std::condition_variable cv;
     bool ready = false;
@@ -32,7 +32,7 @@ void run_monitor(const std::vector<stream>& streams, const string& pid,
 
         if (sync.inuse()) {
             sync.wait();
-            sync.close_all();
+            sync.closeAll();
         }
 
         while (dbg->continueExec()) {

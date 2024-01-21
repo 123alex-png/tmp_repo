@@ -1,3 +1,5 @@
+// TODO: change to dynamic link
+
 #include <netinet/in.h>
 #include <stdio.h>
 #include <sys/socket.h>

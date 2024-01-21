@@ -30,8 +30,8 @@ std::vector<stream> config::getStreams() const { return streams; }
 
 // implementation of class socketClose
 
-socketClose::socketClose(int client_socket, bool use)
-    : client_socket(client_socket), use(use) {}
+socketClose::socketClose(int clientSocket, bool use)
+    : clientSocket(clientSocket), use(use) {}
 void socketClose::wait() {
     std::unique_lock<std::mutex> lock(mutex);
     cv.wait(lock);
@@ -45,4 +45,4 @@ void socketClose::notify() {
     cv.notify_all();
 }
 
-void socketClose::close_all() { close(client_socket); }
+void socketClose::closeAll() { close(clientSocket); }

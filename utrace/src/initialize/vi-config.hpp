@@ -30,7 +30,7 @@ public:
     }
 };
 
-config* vi_write() {
+config* viWrite() {
     vector<string> args{"busybox_unstrip", "vi"};
     vector<stream> streams;
     streams.push_back(stream("safe_write", "safe_write.c:17",

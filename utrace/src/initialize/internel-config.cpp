@@ -2,15 +2,15 @@
 #include "tar-config.hpp"
 #include "vi-config.hpp"
 
-config* simpleConfigInitialize(string config_file) {
-    int id = std::stoi(config_file);
+config* simpleConfigInitialize(string configFile) {
+    int id = std::stoi(configFile);
     switch (id) {
     case 1:
         return dummy();
     case 2:
         return tarFile();
     case 3:
-        return vi_write();
+        return viWrite();
     default:
         return NULL;
     }

@@ -62,7 +62,7 @@ class socketClose {
 private:
     std::mutex mutex;
     std::condition_variable cv;
-    int client_socket;
+    int clientSocket;
     bool ready = false, use;
 
 public:
@@ -70,7 +70,7 @@ public:
     void wait() ;
     bool inuse() const;
     void notify() ;
-    void close_all() ;
+    void closeAll() ;
 };
 
 #endif
