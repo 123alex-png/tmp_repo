@@ -16,13 +16,13 @@ int main(int argc, const char* argv[]) {
     std::string outputFile = "";
     std::vector<std::string> exec;
 
-    desc.add_options()("help", "produce help message")(
-        "config,c", po::value<std::string>(&configFile),
-        "set config file")("exec,e", po::value<std::vector<std::string>>(&exec),
-                           "set run command")("pid,p", po::value<int>(&pid),
-                                              "set pid to be watched")(
-        "port,l", po::value<std::string>(&portFile), "set port to be listened")(
-        "output,o", po::value<std::string>(&outputFile), "set output file");
+    // clang-format off
+    desc.add_options()
+        ("help", "produce help message")
+        ("config,c", po::value<std::string>(&configFile),"set config file")
+        ("port,l", po::value<std::string>(&portFile), "set port to be listened")
+        ("output,o", po::value<std::string>(&outputFile), "set output file");
+    // clang-format on
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -35,16 +35,6 @@ int main(int argc, const char* argv[]) {
     if (vm.count("config")) {
         std::cout << "Config file: " << configFile << std::endl;
     }
-    if (vm.count("exec")) {
-        std::cout << "Exec: ";
-        for (const auto& exe : exec) {
-            std::cout << exe << " ";
-        }
-        std::cout << std::endl;
-    }
-    if (vm.count("pid")) {
-        std::cout << "Pid: " << pid << std::endl;
-    }
     if (vm.count("port")) {
         std::cout << "Port: " << portFile << std::endl;
     }
@@ -54,14 +44,18 @@ int main(int argc, const char* argv[]) {
     config* cfg = nullptr;
     if (!configFile.empty())
         cfg = simpleConfigInitialize(configFile);
-    if (pid != 0) {
-        pidAttach(cfg, pid);
-    } else if (!portFile.empty()) {
-        portWatch(cfg, outputFile, portFile, 1);
-    } else if (!exec.empty()) {
-        cmdRun(cfg, exec);
+    else {
+        // TODO: format of config file is not determined
+        // std::cout << "No config file specified, use default config" <<
+        // std::endl; cfg = simpleConfigInitialize("config.json");
+    }
+    if (!portFile.empty()) {
+        if (portWatch(cfg, outputFile, portFile, 1) < 0) {
+            std::cout << "Failed" << std::endl;
+            return 1;
+        }
     } else {
-        execEventWatch(cfg);
+        std::cout << "No port ready " << std::endl;
     }
     return 0;
 }

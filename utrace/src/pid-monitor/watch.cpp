@@ -1,4 +1,3 @@
-#include <arpa/inet.h>
 #include <cstring>
 #include <ctime>
 #include <fstream>
@@ -90,80 +89,27 @@ void cmdlineGen(const string& pid, const string& outputFile) {
     }
 }
 
-static int recvSignal = 0, sock = 0, status = 0;
-static string filepath = "/tmp/pid-monitor";
-void on_exit() {
-    remove(filepath.c_str());
-    close(sock);
-    std::ofstream o2("/home/cao/Desktop/log2.txt", std::ios::out);
-    if (!o2.is_open()) {
-        perror("open");
-        return;
-    }
-    o2 << "port_watch exit" << std::endl;
-    o2.close();
-}
-
-static int portPidWatch(config* cfg, const string& outputFile, const int port,
-                        int maxClient) {
-    sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock < 0) {
-        perror("socket");
+int portWatch(config* cfg, const string& outputFile, const string& portFile,
+              int maxClient) {
+    int sock = 0;
+    try {
+        int port = std::stoi(portFile);
+        sock = portPidWatch(cfg, outputFile, port, maxClient);
+    } catch (std::invalid_argument& e) {
+        // std::cout << "port is not a number" << std::endl;
+        sock = unixDomainSocketWatch(cfg, outputFile, portFile, maxClient);
+    } catch (std::out_of_range& e) {
+        std::cout << "port is out of range" << std::endl;
         return -1;
     }
-
-    struct sockaddr_in addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(port);
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    if (bind(sock, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        perror("bind");
+    if (sock < 0)
         return -1;
-    }
-
-    if (listen(sock, maxClient) < 0) {
-        perror("listen");
-        return -1;
-    }
-
-    std::ofstream o(filepath, std::ios::out);
-    if (!o.is_open()) {
-        perror("open");
-        return -1;
-    }
-    o << port << std::endl;
-    o.close();
-
-    atexit(on_exit);
-    at_quick_exit(on_exit);
-    signal(SIGINT, [](int x) {
-        if (!status)
-            exit(0);
-        remove(filepath.c_str());
-        recvSignal = x;
-    });
-    signal(SIGTERM, [](int x) {
-        if (!status)
-            exit(0);
-        remove(filepath.c_str());
-        recvSignal = x;
-    });
-    signal(SIGKILL, [](int x) {
-        if (!status)
-            exit(0);
-        remove(filepath.c_str());
-        recvSignal = x;
-    });
-
-    std::cout << "Listening on port " << port << std::endl;
 
     while (true) {
         struct sockaddr_in clientAddress;
         socklen_t clientAddressLength = sizeof(clientAddress);
         int client = accept(sock, (struct sockaddr*)&clientAddress,
                             &clientAddressLength);
-        status = 1;
         if (client < 0) {
             perror("accept");
             return -1;
@@ -208,28 +154,6 @@ static int portPidWatch(config* cfg, const string& outputFile, const int port,
         // std::cout << "send " << succ << std::endl;
         close(client);
         sync.notify();
-        if (recvSignal)
-            exit(0);
-        status = 0;
     }
     return 0;
-}
-
-static int unixDomainSocketWatch(config* cfg, const string& outputFile,
-                                 const string& file, int maxClient) {
-    // TODO
-}
-
-int portWatch(config* cfg, const string& outputFile, const string& portFile,
-              int maxClient) {
-    try {
-        int port = std::stoi(portFile);
-        return portPidWatch(cfg, outputFile, port, maxClient);
-    } catch (std::invalid_argument& e) {
-        // std::cout << "port is not a number" << std::endl;
-        return unixDomainSocketWatch(cfg, outputFile, portFile, maxClient);
-    } catch (std::out_of_range& e) {
-        std::cout << "port is out of range" << std::endl;
-        return -1;
-    }
 }
