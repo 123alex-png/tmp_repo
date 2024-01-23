@@ -31,7 +31,7 @@ private:
     breakpointhandler* handler;
 
 public:
-    stream(const std::string&, const std::string&,breakpointhandler*);
+    stream(const std::string&, const std::string&, breakpointhandler*);
     std::string getName() const;
     std::string getBreakPoint() const;
     data* handle(const std::string&, interface&) const;
@@ -51,7 +51,8 @@ private:
     std::vector<stream> streams;
 
 public:
-    config(const std::string&, const std::vector<std::string>&,           processFilter*, const std::vector<stream>&);
+    config(const std::string&, const std::vector<std::string>&, processFilter*,
+           const std::vector<stream>&);
     std::string getName() const;
     std::vector<std::string> getArguments() const;
     bool chk() const;
@@ -67,10 +68,10 @@ private:
 
 public:
     socketClose(int, bool);
-    void wait() ;
+    void wait();
     bool inuse() const;
-    void notify() ;
-    void closeAll() ;
+    void notify();
+    void closeAll();
 };
 
 #endif
