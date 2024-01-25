@@ -43,7 +43,7 @@ public:
     }
 };
 
-config* coreUtilConfig() {
+config* coreutilConfig() {
     return new config("coreutil", {}, new coreUtilFilter(), {}, true);
 }
 

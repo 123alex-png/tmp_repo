@@ -13,7 +13,7 @@ config* simpleConfigInitialize(string configFile) {
     case 3:
         return viWrite();
     case 4:
-        return coreUtilConfig();
+        return coreutilConfig();
     default:
         return NULL;
     }
