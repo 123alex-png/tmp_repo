@@ -17,14 +17,17 @@ data* stream::handle(const std::string& breakpoint, interface& inter) const {
 // implementation of class config
 config::config(const std::string& name,
                const std::vector<std::string>& arguments, processFilter* filter,
-               const std::vector<stream>& streams)
-    : name(name), arguments(arguments), filter(filter), streams(streams) {}
+               const std::vector<stream>& streams, bool cmdline)
+    : name(name), arguments(arguments), filter(filter), streams(streams),
+      cmdline(cmdline) {}
 
 std::string config::getName() const { return name; }
 
 std::vector<std::string> config::getArguments() const { return arguments; }
 
-bool config::chk() const { return filter->check(name); }
+bool config::getCmdline() const { return cmdline; }
+
+bool config::chk(int pid) const { return filter->check(pid); }
 
 std::vector<stream> config::getStreams() const { return streams; }
 

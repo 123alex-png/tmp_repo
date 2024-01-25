@@ -38,7 +38,7 @@ config* viWrite() {
     // streams.push_back(stream("vifwrite", "vi.c:1073", new
     // vifwriteBreakpointHandler()));
     return new config("busybox_unstrip", args, new simpleProcessFilter(),
-                      streams);
+                      streams, false);
 }
 
 #endif

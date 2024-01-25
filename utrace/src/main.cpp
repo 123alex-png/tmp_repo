@@ -46,8 +46,8 @@ int main(int argc, const char* argv[]) {
         cfg = simpleConfigInitialize(configFile);
     else {
         // TODO: format of config file is not determined
-        // std::cout << "No config file specified, use default config" <<
-        // std::endl; cfg = simpleConfigInitialize("config.json");
+        std::cout << "No config file specified. Exited." << std::endl;
+        return 1;
     }
     if (!portFile.empty()) {
         if (portWatch(cfg, outputFile, portFile, 1) < 0) {

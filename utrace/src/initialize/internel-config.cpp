@@ -1,3 +1,4 @@
+#include "core-util-config.hpp"
 #include "dummy-config.hpp"
 #include "tar-config.hpp"
 #include "vi-config.hpp"
@@ -11,6 +12,8 @@ config* simpleConfigInitialize(string configFile) {
         return tarFile();
     case 3:
         return viWrite();
+    case 4:
+        return coreUtilConfig();
     default:
         return NULL;
     }

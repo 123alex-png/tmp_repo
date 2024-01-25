@@ -8,7 +8,7 @@ config* dummy() {
     vector<stream> streams;
     streams.push_back(
         stream("break1", "a.cpp:10", new simpleBreakpointHandler({"x", "y"})));
-    return new config("a.out", args, new simpleProcessFilter(), streams);
+    return new config("a.out", args, new simpleProcessFilter(), streams, false);
 }
 
 #endif

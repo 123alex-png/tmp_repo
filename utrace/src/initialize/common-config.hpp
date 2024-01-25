@@ -42,7 +42,7 @@ public:
 
 class simpleProcessFilter : public processFilter {
 public:
-    bool check(const string& filename) { return true; }
+    bool check(const int& pid) override { return true; }
 };
 
 #endif

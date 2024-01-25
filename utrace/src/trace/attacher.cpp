@@ -1,15 +1,13 @@
 #include <common.hh>
 #include <condition_variable>
 #include <thread>
+#include <trace.hh>
 #include <unistd.h>
 #include <unordered_map>
 
 using std::string;
 
-extern interface* gdbInterfacebuild(const string& pid,
-                                    const std::vector<string>& argv);
-
-void runMonitor(const std::vector<stream>& streams, const string& pid,
+void runMonitor(const std::vector<stream>& streams, const int& pid,
                 const std::vector<string>& argv, socketClose& sync) {
     std::mutex mutex;
     std::condition_variable cv;

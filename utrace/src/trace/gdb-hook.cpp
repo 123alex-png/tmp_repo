@@ -1,6 +1,3 @@
-#ifndef GDB_HOOK_HPP
-#define GDB_HOOK_HPP
-
 #include <boost/asio/execution/context.hpp>
 #include <boost/process.hpp>
 #include <boost/process/io.hpp>
@@ -65,12 +62,12 @@ private:
     }
 
 public:
-    gdbInterface(const std::string& pid, const std::vector<string>& argv)
+    gdbInterface(const int& pid, const std::vector<string>& argv)
         : gdbProcess(), gdbInput(), gdbOutput() {
         // Launch GDB process
-        string command = "gdb --interpreter=mi -p " + pid;
+        string command = "gdb --interpreter=mi -p " + std::to_string(pid);
         state = state::running;
-        if (pid.empty()) {
+        if (!argv.empty()) {
             command = "gdb --interpreter=mi " + argv[0] + " --args ";
             for (const auto& arg : argv)
                 command += " " + arg;
@@ -164,8 +161,6 @@ public:
     }
 };
 
-interface* gdbInterfacebuild(const string& pid,
-                             const std::vector<string>& argv) {
+interface* gdbInterfacebuild(const int& pid, const std::vector<string>& argv) {
     return new gdbInterface(pid, argv);
 }
-#endif

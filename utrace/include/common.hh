@@ -39,12 +39,13 @@ public:
 
 class processFilter {
 public:
-    virtual bool check(const std::string& filename) = 0;
+    virtual bool check(const int&) = 0;
 };
 
 class config {
 private:
     std::string name;
+    bool cmdline;
     std::vector<std::string> arguments;
     processFilter* filter;
 
@@ -52,10 +53,11 @@ private:
 
 public:
     config(const std::string&, const std::vector<std::string>&, processFilter*,
-           const std::vector<stream>&);
+           const std::vector<stream>&, bool);
     std::string getName() const;
     std::vector<std::string> getArguments() const;
-    bool chk() const;
+    bool getCmdline() const;
+    bool chk(int pid) const;
     std::vector<stream> getStreams() const;
 };
 
