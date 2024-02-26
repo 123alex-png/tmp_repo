@@ -2,6 +2,7 @@
 #define COMMON_HH
 
 #include <condition_variable>
+#include <fstream>
 #include <mutex>
 #include <string>
 #include <unistd.h>
@@ -9,7 +10,7 @@
 
 class data {
 public:
-    virtual void output() const = 0;
+    virtual void output(const std::string& outputFile) const = 0;
 };
 
 class interface {

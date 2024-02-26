@@ -8,7 +8,8 @@
 using std::string;
 
 void runMonitor(const std::vector<stream>& streams, const int& pid,
-                const std::vector<string>& argv, socketClose& sync) {
+                const std::vector<string>& argv, socketClose& sync,
+                const string& outputFile) {
     std::mutex mutex;
     std::condition_variable cv;
     bool ready = false;
@@ -37,7 +38,9 @@ void runMonitor(const std::vector<stream>& streams, const int& pid,
             string breakpoint = dbg->currentBreakpointHit();
             if (breakpoint == "")
                 continue;
-            breakpoints.at(breakpoint).handle(breakpoint, *dbg)->output();
+            breakpoints.at(breakpoint)
+                .handle(breakpoint, *dbg)
+                ->output(outputFile);
         }
         delete dbg;
     };

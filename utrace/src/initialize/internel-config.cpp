@@ -2,6 +2,7 @@
 #include "dummy-config.hpp"
 #include "tar-config.hpp"
 #include "vi-config.hpp"
+#include "whisper-cpp-config.hpp"
 
 config* simpleConfigInitialize(string configFile) {
     int id = std::stoi(configFile);
@@ -14,6 +15,8 @@ config* simpleConfigInitialize(string configFile) {
         return viWrite();
     case 4:
         return coreutilConfig();
+    case 5:
+        return whisperCppConfig();
     default:
         return NULL;
     }

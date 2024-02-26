@@ -98,9 +98,9 @@ public:
         string ret = "";
         do {
             string output = readGDB();
-            if (output.find("error") != string::npos) {
-                throw std::runtime_error("Error adding breakpoint");
-            }
+            // if (output.find("error") != string::npos) {
+            //     throw std::runtime_error("Error adding breakpoint");
+            // }
             std::regex regex("\\^done,bkpt=\\{number=\"([0-9]+)\"");
             std::smatch match;
             if (std::regex_search(output, match, regex) && match.size() == 2) {

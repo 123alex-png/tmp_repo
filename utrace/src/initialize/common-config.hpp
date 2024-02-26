@@ -4,6 +4,7 @@
 #include <common.hh>
 #include <ctime>
 #include <iostream>
+#include <output.hh>
 
 using std::cout;
 using std::endl;
@@ -18,7 +19,7 @@ private:
 public:
     simpleData(const string breakpoint, const vector<string>& vals)
         : breakpoint(breakpoint), vals(vals) {}
-    void output() const {
+    void output(const string& outputFile) const override {
         cout << time(0) << ": Breakpoint: " << breakpoint << ": ";
         for (auto& val : vals)
             cout << val << ' ';

@@ -98,8 +98,8 @@ int portWatch(config* cfg, const string& outputFile, const string& portFile,
         socketClose sync(client, true);
 
         if (!cfg->getStreams().empty())
-            runMonitor(cfg->getStreams(), data.pid, std::vector<string>(),
-                       sync);
+            runMonitor(cfg->getStreams(), data.pid, std::vector<string>(), sync,
+                       outputFile);
 
         // std::cout << "Attaching to pid " << data.pid << std::endl;
 
