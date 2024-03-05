@@ -1,18 +1,20 @@
-#include <cstring>
-#include <ctime>
+#include <connect/connect.hh>
 #include <fstream>
 #include <iostream>
 #include <netinet/in.h>
-#include <output.hh>
-#include <signal.h>
 #include <sstream>
 #include <sys/socket.h>
-#include <trace.hh>
 #include <unistd.h>
-#include <watch.hh>
 
 using std::string;
-bool check(int pid, config* cfg) {
+
+// implementation of class simpleProcessFilter
+
+bool simpleProcessFilter::check(const int& pid) { return true; }
+
+// implementation of class connection
+
+bool connection::check(const pid_t& pid) {
     std::vector<std::string> arguments;
     std::ifstream file("/proc/" + std::to_string(pid) + "/cmdline");
     if (file.is_open()) {
@@ -27,7 +29,7 @@ bool check(int pid, config* cfg) {
             arguments.push_back(argument);
         }
     }
-    for (const auto& arg : cfg->getArguments()) {
+    for (const auto& arg : args) {
         bool flag = false;
         for (const auto& argument : arguments) {
             if (argument.find(arg) != std::string::npos) {
@@ -39,78 +41,53 @@ bool check(int pid, config* cfg) {
             return false;
     }
 
-    if (!cfg->chk(pid))
+    if (!filter->check(pid))
         return false;
 
     return true;
 }
 
-int portWatch(config* cfg, const string& outputFile, const string& portFile,
-              int maxClient) {
-    int sock = 0;
-    try {
-        int port = std::stoi(portFile);
-        sock = portPidWatch(cfg, outputFile, port, maxClient);
-    } catch (std::invalid_argument& e) {
-        // std::cout << "port is not a number" << std::endl;
-        sock = unixDomainSocketWatch(cfg, outputFile, portFile, maxClient);
-    } catch (std::out_of_range& e) {
-        std::cout << "port is out of range" << std::endl;
-        return -1;
-    }
-    if (sock < 0)
-        return -1;
+void connection::setSockfd(int sockfd) { this->sockfd = sockfd; }
 
+connection::connection(const std::string& name,
+                       const std::vector<std::string>& args,
+                       processFilter* filter, trace* trc, int maxClient)
+    : name(name), args(args), filter(filter), trc(trc), maxClient(maxClient) {}
+
+void connection::watch() {
     while (true) {
         struct sockaddr_in clientAddress;
         socklen_t clientAddressLength = sizeof(clientAddress);
-        int client = accept(sock, (struct sockaddr*)&clientAddress,
+        int client = accept(sockfd, (struct sockaddr*)&clientAddress,
                             &clientAddressLength);
-        if (client < 0) {
-            perror("accept");
-            return -1;
-        }
+        if (client < 0)
+            throw std::runtime_error("accept failed");
 
         struct {
             int pid;
             unsigned magicnumber;
         } data;
-        if (recv(client, &data, sizeof(data), 0) < 0) {
-            perror("recv");
-            return -1;
-        }
+        if (recv(client, &data, sizeof(data), 0) < 0)
+            throw std::runtime_error("recv failed");
         if (data.magicnumber != 0xdeadbeef)
-            continue;
+            throw std::runtime_error("invalid magic number");
 
-        if (!check(data.pid, cfg)) {
+        if (!check(data.pid)) {
             unsigned fail = 0xdeadbeef;
-            if (send(client, &fail, sizeof(fail), 0) < 0) {
-                perror("send");
-                return -1;
-            }
+            if (send(client, &fail, sizeof(fail), 0) < 0)
+                throw std::runtime_error("send failed");
             close(client);
             continue;
         }
 
-        if (cfg->getCmdline())
-            cmdline(data.pid, outputFile);
-
-        socketClose sync(client, true);
-
-        if (!cfg->getStreams().empty())
-            runMonitor(cfg->getStreams(), data.pid, std::vector<string>(), sync,
-                       outputFile);
+        trc->work(data.pid);
 
         // std::cout << "Attaching to pid " << data.pid << std::endl;
 
         unsigned succ = 0xdeadbeef;
-        if (send(client, &succ, sizeof(succ), 0) < 0) {
-            perror("send");
-            return -1;
-        }
+        if (send(client, &succ, sizeof(succ), 0) < 0)
+            throw std::runtime_error("send failed");
         // std::cout << "send " << succ << std::endl;
         close(client);
-        sync.notify();
     }
-    return 0;
 }

@@ -1,10 +1,9 @@
 #include <boost/program_options.hpp>
 #include <cassert>
-#include <common.hh>
+#include <config/config.hh>
 #include <iostream>
-#include <watch.hh>
+#include <output/output.hh>
 
-config* simpleConfigInitialize(std::string config_file);
 int main(int argc, const char* argv[]) {
     std::cout << "Hello, world!" << std::endl;
     namespace po = boost::program_options;
@@ -34,28 +33,25 @@ int main(int argc, const char* argv[]) {
     }
     if (vm.count("config")) {
         std::cout << "Config file: " << configFile << std::endl;
-    }
+    } else
+        throw std::invalid_argument("Config file is required");
+
     if (vm.count("port")) {
         std::cout << "Port: " << portFile << std::endl;
-    }
+    } else
+        throw std::invalid_argument("Port file is required");
+
+    output* out = nullptr;
     if (vm.count("output")) {
         std::cout << "Output: " << outputFile << std::endl;
-    }
-    config* cfg = nullptr;
-    if (!configFile.empty())
-        cfg = simpleConfigInitialize(configFile);
-    else {
-        // TODO: format of config file is not determined
-        std::cout << "No config file specified. Exited." << std::endl;
-        return 1;
-    }
-    if (!portFile.empty()) {
-        if (portWatch(cfg, outputFile, portFile, 1) < 0) {
-            std::cout << "Failed" << std::endl;
-            return 1;
-        }
-    } else {
-        std::cout << "No port ready " << std::endl;
-    }
+        out = new output(outputFile);
+    } else
+        out = new output();
+
+    configInit* simpleConfigInitialize =
+        new configInit(configFile, portFile, out);
+    config* cfg = simpleConfigInitialize->getConfig();
+    connection* conn = cfg->getConnect();
+    conn->watch();
     return 0;
 }

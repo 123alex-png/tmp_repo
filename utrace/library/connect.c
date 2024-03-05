@@ -12,8 +12,6 @@
 
 static int portSocket(int port) {
     printf("start client\n");
-    if (!access("/tmp/utrace", F_OK))
-        return -1;
     // Create socket for client
     int client_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (client_socket < 0) {
