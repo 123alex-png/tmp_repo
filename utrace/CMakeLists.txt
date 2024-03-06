@@ -8,8 +8,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug)
 
 # Add include directories
-include_directories(include)
-include_directories(third-party)
+include_directories(src/include)
+include_directories(src/third-party)
 
 # Find Boost libraries
 find_package(Boost REQUIRED COMPONENTS program_options)
@@ -34,7 +34,6 @@ file(GLOB_RECURSE ALL_SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/include/*.hh
     ${SOURCES}
     ${LIB_SOURCES}
-    ${CMAKE_SOURCE_DIR}/src/*.hpp
 ) 
 
 add_custom_target(
