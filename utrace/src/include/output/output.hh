@@ -5,6 +5,7 @@
 #include <streambuf>
 #include <string>
 #include <vector>
+#include <nlohmann/json.hpp>
 
 class data {
 private:
@@ -13,7 +14,7 @@ private:
 public:
     data();
     time_t getTime() const;
-    virtual std::string toString() const = 0;
+    virtual nlohmann::json toJson() const = 0;
 };
 
 class cmdlineData : public data {
@@ -22,7 +23,7 @@ private:
 
 public:
     cmdlineData(const pid_t pid);
-    std::string toString() const override;
+    nlohmann::json toJson() const override;
 };
 
 class simpleData : public data {
@@ -33,7 +34,7 @@ private:
 public:
     simpleData(const std::string breakpoint,
                const std::vector<std::string>& vals);
-    std::string toString() const override;
+    nlohmann::json toJson() const override;
 };
 
 class output {

@@ -1,6 +1,5 @@
 #include <ctime>
 #include <fstream>
-#include <nlohmann/json.hpp>
 #include <output/output.hh>
 
 data::data() : time(std::time(nullptr)) {}
@@ -23,25 +22,25 @@ cmdlineData::cmdlineData(const pid_t pid) {
     this->args = arguments;
 }
 
-std::string cmdlineData::toString() const {
+nlohmann::json cmdlineData::toJson() const {
     using json = nlohmann::json;
     json j;
     j["time"] = getTime();
     j["cmdline"] = this->args;
-    return j.dump();
+    return j;
 }
 
 simpleData::simpleData(const std::string breakpoint,
                        const std::vector<std::string>& vals)
     : data(), breakpoint(breakpoint), vals(vals) {}
 
-std::string simpleData::toString() const {
+nlohmann::json simpleData::toJson() const {
     using json = nlohmann::json;
     json j;
     j["time"] = getTime();
     j["breakpoint"] = this->breakpoint;
     j["values"] = this->vals;
-    return j.dump();
+    return j;
 }
 
 output::output(const std::string& outputFile) {
@@ -53,7 +52,7 @@ output::output() : file() { outputBuffer = std::cout.rdbuf(); }
 
 void output::write(const data& d) {
     std::ostream output(outputBuffer);
-    output << d.toString() << std::endl;
+    output << d.toJson().dump() << std::endl;
 }
 
 void output::close() {
