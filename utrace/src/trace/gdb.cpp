@@ -48,26 +48,31 @@ std::string gdb::getBreakpointNumber(const std::string& output) {
     return "";
 }
 
-gdb::gdb() : gdbProcess(), gdbInput(), gdbOutput(), state(state::stopped){};
-
-gdb::~gdb() {
-    // Terminate GDB process
-    sendCommand("-gdb-exit");
-    gdbProcess.terminate();
-    gdbProcess.wait();
-    gdbInput.close();
-    gdbOutput.close();
+void gdb::handleSignal(std::string& reason, const std::string& output) {
+    if (reason != "signal-received")
+        return;
+    reason = "";
+    std::regex regex(
+        "\\*stopped,reason=\"signal-received\",signal-name=\"([^\"]*)\"");
+    std::smatch match;
+    if (std::regex_search(output, match, regex) && match.size() == 2) {
+        sendCommand("signal " + match[1].str());
+    }
 }
+
+gdb::gdb() : gdbProcess(), gdbInput(), gdbOutput(){};
+
+gdb::~gdb() {}
 
 void gdb::start(const pid_t& pid) {
     // Launch GDB process
     std::string command = "gdb --interpreter=mi -p " + std::to_string(pid);
-    state = state::running;
     gdbProcess =
         bp::child(command, bp::std_in<gdbInput, bp::std_out> gdbOutput);
     // Wait for GDB to start
     std::string output;
-    while (!output.empty()) {
+    while (!output.empty() && output[0] != '~' && output[0] != '@' &&
+           output[0] != '&') {
         std::getline(gdbOutput, output);
         // std::cout << "GDB output: " << output << std::endl;
     }
@@ -92,7 +97,7 @@ std::string gdb::addBreakpoint(const std::string& breakpoint) {
     return ret;
 }
 
-std::string gdb::expEval(const std::string& exp) {
+std::string gdb::evaluateExpression(const std::string& exp) {
     sendCommand(static_cast<std::string>("-data-evaluate-expression \"") + exp +
                 "\"");
     std::string value = "";
@@ -112,13 +117,9 @@ std::string gdb::expEval(const std::string& exp) {
     return value;
 }
 
-bool gdb::continueExec() {
+std::pair<std::string, std::string> gdb::continueExec() {
     // Send continue command to GDB
-    if (state == state::stopped)
-        sendCommand("-exec-run");
-    else
-        sendCommand("-exec-continue");
-    state = state::running;
+    sendCommand("-exec-continue");
     std::string reason = "";
     do {
         // Read GDB output
@@ -127,16 +128,22 @@ bool gdb::continueExec() {
         // Analyze the reason for stopping
         reason = getStopReason(output);
 
+        // Handle signals
+        handleSignal(reason, output);
+
         // If GDB hit a breakpoint, analyze the breakpoint number
         if (reason == "breakpoint-hit") {
             std::string breakpointNumber = getBreakpointNumber(output);
-            currentBreakpoint = breakpointNumber;
-            return true;
+            return {reason, breakpoints[breakpointNumber]};
         }
     } while (reason.empty());
-    return false;
+    return {reason, ""};
 }
 
-std::string gdb::currentBreakpointHit() const {
-    return !currentBreakpoint.empty() ? breakpoints.at(currentBreakpoint) : "";
+void gdb::end() {
+    // Terminate GDB process
+    sendCommand("-gdb-exit");
+    gdbProcess.wait();
+    gdbInput.close();
+    gdbOutput.close();
 }

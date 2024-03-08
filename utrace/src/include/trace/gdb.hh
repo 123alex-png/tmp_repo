@@ -3,7 +3,6 @@
 #include <boost/process.hpp>
 #include <boost/process/io.hpp>
 #include <trace/trace.hh>
-#include <unordered_map>
 
 class gdb : public debugger {
 private:
@@ -11,8 +10,6 @@ private:
     boost::process::opstream gdbInput;
     boost::process::ipstream gdbOutput;
     std::unordered_map<std::string, std::string> breakpoints;
-    std::string currentBreakpoint;
-    enum class state { running, stopped } state;
 
     void sendCommand(const std::string& command);
 
@@ -21,6 +18,8 @@ private:
     std::string getStopReason(const std::string& output);
 
     std::string getBreakpointNumber(const std::string& output);
+
+    void handleSignal(std::string &reason, const std::string &output);
 
 public:
     gdb();
@@ -31,9 +30,9 @@ public:
 
     std::string addBreakpoint(const std::string& breakpoint) override;
 
-    std::string expEval(const std::string& exp) override;
+    std::string evaluateExpression(const std::string& exp) override;
 
-    bool continueExec() override;
+    std::pair<std::string, std::string> continueExec() override;
 
-    std::string currentBreakpointHit() const override;
+    void end() override;
 };

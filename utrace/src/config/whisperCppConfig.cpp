@@ -3,7 +3,6 @@
 #include <connect/unixDomainSocket.hh>
 #include <fstream>
 #include <sstream>
-#include <trace/gdb.hh>
 
 bool whisperCppCheck::check(const pid_t& pid) {
     std::ifstream file("/proc/" + std::to_string(pid) + "/comm");
@@ -27,7 +26,7 @@ whisperCppConfig::whisperCppConfig(output* out, const std::string& portFile)
                              new simpleBreakpointHandler({"text"})));
     streams.push_back(stream("whisper.cpp", "whisper.cpp:5754",
                              new simpleBreakpointHandler({"text"})));
-    trace* trc = new trace(streams, false, getOutput(), new gdb());
+    trace* trc = new trace(streams, false, getOutput(), trace::dbgType::GDB);
     setTrace(trc);
     connection* conn = nullptr;
     try {

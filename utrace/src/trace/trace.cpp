@@ -1,6 +1,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <thread>
+#include <trace/gdb.hh>
 #include <trace/trace.hh>
 #include <unistd.h>
 #include <unordered_map>
@@ -29,15 +30,23 @@ simpleData simpleBreakpointHandler::handle(const std::string& breakpoint,
                                            debugger& inter) {
     std::vector<std::string> vals;
     for (auto& var : vars)
-        vals.push_back(inter.expEval(var));
+        vals.push_back(inter.evaluateExpression(var));
     return simpleData(breakpoint, vals);
+}
+
+// implementation of class simpleEventHandler
+
+std::pair<eventHandler::action, std::optional<simpleData>>
+simpleEventHandler::handle() {
+    return {eventHandler::action::EXIT, std::nullopt};
 }
 
 // implementation of class trace
 
 trace::trace(const std::vector<stream>& streams, bool cmdlineOutput,
-             output* out, debugger* dbg)
-    : cmdlineOutput(cmdlineOutput), streams(streams), dbg(dbg), out(out) {}
+             output* out, dbgType dbg)
+    : cmdlineOutput(cmdlineOutput), streams(streams), debuggerType(dbg),
+      out(out) {}
 
 void trace::work(const pid_t& pid) {
     if (cmdlineOutput)
@@ -51,6 +60,14 @@ void trace::work(const pid_t& pid) {
     bool ready = false;
 
     auto exeRun = [&]() {
+        debugger* dbg = nullptr;
+        switch (debuggerType) {
+        case dbgType::GDB:
+            dbg = new gdb();
+            break;
+        default:
+            throw std::runtime_error("Debugger not supported");
+        }
         dbg->start(pid);
         std::unordered_map<std::string, const stream&> breakpoints;
         for (auto& stream : streams) {
@@ -66,22 +83,33 @@ void trace::work(const pid_t& pid) {
             cv.notify_all();
         }
 
-        while (dbg->continueExec()) {
-            std::string breakpoint = dbg->currentBreakpointHit();
-            if (breakpoint == "")
-                continue;
-            out->write(breakpoints.at(breakpoint).handle(*dbg));
+        while (1) {
+            auto [reason, breakpoint] = dbg->continueExec();
+            if (reason == "breakpoint-hit")
+                out->write(breakpoints.at(breakpoint).handle(*dbg));
+            else {
+                auto it = eventHandlers.find(reason);
+                if (it == eventHandlers.end())
+                    eventHandlers.insert({reason, new simpleEventHandler()});
+                auto [action, data] = eventHandlers.at(reason)->handle();
+                if (data.has_value())
+                    out->write(data.value());
+                if (action == eventHandler::action::EXIT)
+                    break;
+            }
         }
+        dbg->end();
         delete dbg;
     };
 
     std::thread t(exeRun);
-    t.detach();
 
     {
         std::unique_lock<std::mutex> lock(mutex);
         while (!ready)
             cv.wait(lock);
     }
+
+    t.detach();
     return;
 }

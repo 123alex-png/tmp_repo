@@ -4,7 +4,6 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <trace/gdb.hh>
 
 bool coreUtilFilter::check(const pid_t& pid) {
     std::ifstream file("/proc/" + std::to_string(pid) + "/comm");
@@ -23,7 +22,7 @@ bool coreUtilFilter::check(const pid_t& pid) {
 
 coreutilConfig::coreutilConfig(output* out, const std::string& portFile)
     : config(out) {
-    trace* trc = new trace({}, true, getOutput(), nullptr);
+    trace* trc = new trace({}, true, getOutput(), trace::dbgType::GDB);
     setTrace(trc);
     connection* conn = nullptr;
     try {

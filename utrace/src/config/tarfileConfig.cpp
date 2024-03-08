@@ -1,7 +1,6 @@
 #include <config/tarfileConfig.hh>
 #include <connect/portSocket.hh>
 #include <connect/unixDomainSocket.hh>
-#include <trace/gdb.hh>
 
 tarfileConfig::tarfileConfig(output* out, const std::string& portFile)
     : config(out) {
@@ -13,7 +12,7 @@ tarfileConfig::tarfileConfig(output* out, const std::string& portFile)
     streams.push_back(stream("open3_or_warn", "xfuncs_printf.c:166",
                              new simpleBreakpointHandler({"pathname", "ret"})));
 
-    trace* trc = new trace(streams, false, getOutput(), new gdb());
+    trace* trc = new trace(streams, false, getOutput(), trace::dbgType::GDB);
     setTrace(trc);
     connection* conn = nullptr;
     try {
