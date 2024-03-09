@@ -22,11 +22,9 @@ private:
     void handleSignal(std::string &reason, const std::string &output);
 
 public:
-    gdb();
+    gdb(pid_t pid);
 
     ~gdb();
-
-    void start(const pid_t& pid) override;
 
     std::string addBreakpoint(const std::string& breakpoint) override;
 
@@ -34,5 +32,4 @@ public:
 
     std::pair<std::string, std::string> continueExec() override;
 
-    void end() override;
 };

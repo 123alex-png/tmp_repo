@@ -60,11 +60,7 @@ void gdb::handleSignal(std::string& reason, const std::string& output) {
     }
 }
 
-gdb::gdb() : gdbProcess(), gdbInput(), gdbOutput(){};
-
-gdb::~gdb() {}
-
-void gdb::start(const pid_t& pid) {
+gdb::gdb(pid_t pid) : gdbProcess(), gdbInput(), gdbOutput() {
     // Launch GDB process
     std::string command = "gdb --interpreter=mi -p " + std::to_string(pid);
     gdbProcess =
@@ -77,6 +73,14 @@ void gdb::start(const pid_t& pid) {
         // std::cout << "GDB output: " << output << std::endl;
     }
     // std::cout << command << std::endl;
+};
+
+gdb::~gdb() {
+    // Terminate GDB process
+    sendCommand("-gdb-exit");
+    gdbProcess.wait();
+    gdbInput.close();
+    gdbOutput.close();
 }
 
 std::string gdb::addBreakpoint(const std::string& breakpoint) {
@@ -138,12 +142,4 @@ std::pair<std::string, std::string> gdb::continueExec() {
         }
     } while (reason.empty());
     return {reason, ""};
-}
-
-void gdb::end() {
-    // Terminate GDB process
-    sendCommand("-gdb-exit");
-    gdbProcess.wait();
-    gdbInput.close();
-    gdbOutput.close();
 }

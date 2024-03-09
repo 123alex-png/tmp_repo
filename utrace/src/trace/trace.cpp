@@ -63,12 +63,11 @@ void trace::work(const pid_t& pid) {
         debugger* dbg = nullptr;
         switch (debuggerType) {
         case dbgType::GDB:
-            dbg = new gdb();
+            dbg = new gdb(pid);
             break;
         default:
             throw std::runtime_error("Debugger not supported");
         }
-        dbg->start(pid);
         std::unordered_map<std::string, const stream&> breakpoints;
         for (auto& stream : streams) {
             if (dbg->addBreakpoint(stream.getBreakPoint()).empty()) {
@@ -98,7 +97,6 @@ void trace::work(const pid_t& pid) {
                     break;
             }
         }
-        dbg->end();
         delete dbg;
     };
 

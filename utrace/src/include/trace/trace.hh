@@ -8,11 +8,9 @@
 
 class debugger {
 public:
-    virtual void start(const pid_t& pid) = 0;
     virtual std::string addBreakpoint(const std::string& breakpoint) = 0;
     virtual std::pair<std::string, std::string> continueExec() = 0;
     virtual std::string evaluateExpression(const std::string& exp) = 0;
-    virtual void end() = 0;
 };
 
 class breakpointhandler {
