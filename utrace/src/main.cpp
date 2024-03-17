@@ -34,7 +34,7 @@ int main(int argc, const char* argv[]) {
     if (vm.count("config")) {
         std::cout << "Config file: " << configFile << std::endl;
     } else
-        throw std::invalid_argument("Config file is required");
+        std::cout << "No config file was set." << std::endl;
 
     if (vm.count("port")) {
         std::cout << "Port: " << portFile << std::endl;

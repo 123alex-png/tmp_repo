@@ -22,10 +22,13 @@ private:
     bool check(const pid_t& pid);
 
 protected:
-    void setSockfd(int sockfd);
+    int getSockfd();
+    output* getOutput();
 
 public:
     connection(const std::string& name, const std::vector<std::string>& args,
-               processFilter* filter, trace* trc, int maxClient);
-    void watch();
+               processFilter* filter, trace* trc, int maxClient, int port);
+    connection(const std::string& name, const std::vector<std::string>& args,
+               processFilter* filter, trace* trc, int maxClient, const std::string& path);
+    virtual void watch();
 };

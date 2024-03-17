@@ -11,6 +11,9 @@ class data {
 private:
     time_t time;
 
+protected:
+    void setTime(const time_t time);
+
 public:
     data();
     time_t getTime() const;
@@ -34,6 +37,15 @@ private:
 public:
     simpleData(const std::string breakpoint,
                const std::vector<std::string>& vals);
+    nlohmann::json toJson() const override;
+};
+
+class jsonData : public data {
+private:
+    nlohmann::json j;
+
+public:
+    jsonData(const std::string &jsonString, const time_t time);
     nlohmann::json toJson() const override;
 };
 

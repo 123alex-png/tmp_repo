@@ -1,6 +1,4 @@
 #include <config/whisperCppConfig.hh>
-#include <connect/portSocket.hh>
-#include <connect/unixDomainSocket.hh>
 #include <fstream>
 #include <sstream>
 
@@ -31,11 +29,11 @@ whisperCppConfig::whisperCppConfig(output* out, const std::string& portFile)
     connection* conn = nullptr;
     try {
         int port = std::stoi(portFile);
-        conn = new portSocket("whisper.cpp", {}, new whisperCppCheck(), trc, 1,
+        conn = new connection("whisper.cpp", {}, new whisperCppCheck(), trc, 1,
                               port);
     } catch (const std::invalid_argument& e) {
-        conn = new unixDomainSocket("whisper.cpp", {}, new whisperCppCheck(),
-                                    trc, 1, portFile);
+        conn = new connection("whisper.cpp", {}, new whisperCppCheck(), trc, 1,
+                              portFile);
     }
     setConnect(conn);
 }

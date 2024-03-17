@@ -1,6 +1,6 @@
 #pragma once
 
-#include <connect/connect.hh>
+#include <connection/connection.hh>
 #include <output/output.hh>
 #include <trace/trace.hh>
 

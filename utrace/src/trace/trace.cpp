@@ -111,3 +111,5 @@ void trace::work(const pid_t& pid) {
     t.detach();
     return;
 }
+
+output* trace::getOutput() { return out; }

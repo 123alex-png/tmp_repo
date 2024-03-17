@@ -18,13 +18,16 @@ find_package(Threads REQUIRED)
 # Get all .cpp files in the /src folder
 file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
 file(GLOB_RECURSE LIB_SOURCES "${CMAKE_SOURCE_DIR}/library/*.c")
+file(GLOB_RECURSE LIB_SOURCES_2 "${CMAKE_SOURCE_DIR}/library2/*.c")
 
 # Create the executable
 add_executable(utrace ${SOURCES})
 add_library(utrace_lib SHARED ${LIB_SOURCES})
+add_library(utrace_lib_2 STATIC ${LIB_SOURCES_2})
 
 # Set the output name for the shared library
 set_target_properties(utrace_lib PROPERTIES OUTPUT_NAME "utrace")
+set_target_properties(utrace_lib_2 PROPERTIES OUTPUT_NAME "utrace-lib")
 
 # Link Boost libraries
 target_link_libraries(utrace Boost::program_options Threads::Threads)
@@ -34,6 +37,8 @@ file(GLOB_RECURSE ALL_SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/include/*.hh
     ${SOURCES}
     ${LIB_SOURCES}
+    ${LIB_SOURCES_2}
+    ${CMAKE_SOURCE_DIR}/library2/*.h
 ) 
 
 add_custom_target(
@@ -46,6 +51,7 @@ add_custom_target(
 
 add_dependencies(utrace clang-format)
 add_dependencies(utrace_lib clang-format)
+add_dependencies(utrace_lib_2 clang-format)
 
 add_custom_target(
     clean-all

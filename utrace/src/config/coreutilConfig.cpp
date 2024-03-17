@@ -1,6 +1,4 @@
 #include <config/coreutilConfig.hh>
-#include <connect/portSocket.hh>
-#include <connect/unixDomainSocket.hh>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -28,10 +26,10 @@ coreutilConfig::coreutilConfig(output* out, const std::string& portFile)
     try {
         int port = std::stoi(portFile);
         conn =
-            new portSocket("coreUtil", {}, new coreUtilFilter(), trc, 1, port);
+            new connection("coreUtil", {}, new coreUtilFilter(), trc, 1, port);
     } catch (const std::invalid_argument& e) {
-        conn = new unixDomainSocket("coreUtil", {}, new coreUtilFilter(), trc,
-                                    1, portFile);
+        conn = new connection("coreUtil", {}, new coreUtilFilter(), trc, 1,
+                              portFile);
     }
     setConnect(conn);
 }

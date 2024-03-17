@@ -5,6 +5,8 @@
 data::data() : time(std::time(nullptr)) {}
 time_t data::getTime() const { return time; }
 
+void data::setTime(const time_t time) { this->time = time; }
+
 cmdlineData::cmdlineData(const pid_t pid) {
     std::ifstream file("/proc/" + std::to_string(pid) + "/cmdline");
     std::vector<std::string> arguments;
@@ -27,6 +29,19 @@ nlohmann::json cmdlineData::toJson() const {
     json j;
     j["time"] = getTime();
     j["cmdline"] = this->args;
+    return j;
+}
+
+jsonData::jsonData(const std::string& jsonString, const time_t time)
+    : data(), j(jsonString) {
+    setTime(time);
+}
+
+nlohmann::json jsonData::toJson() const {
+    using json = nlohmann::json;
+    json j;
+    j["time"] = getTime();
+    j["json"] = this->j;
     return j;
 }
 

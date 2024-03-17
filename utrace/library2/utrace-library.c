@@ -1,10 +1,20 @@
+#include "utrace.h"
 #include <errno.h>
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <time.h>
 #include <unistd.h>
+
+static int socketfd = -2;
+
+static void cleanup() {
+    if (socketfd >= 0)
+        close(socketfd);
+    socketfd = -2;
+}
 
 static int portSocket(int port) {
     // Create socket for client
@@ -45,34 +55,49 @@ static int unixDomainSocket(const char* port) {
     return client_socket;
 }
 
-static void start_client() {
+static int startClient() {
     const char* port = getenv("UTRACE_PORT");
     if (!port)
-        return;
+        return -1;
     char* endptr = NULL;
     int port_num = strtol(port, &endptr, 10);
-    int client_socket = -1;
     if (endptr && endptr[0] == '\0')
-        client_socket = portSocket(port_num);
-    else
-        client_socket = unixDomainSocket(port);
-    if (client_socket == -1)
-        return;
-    // Send message to server
-    struct {
-        int pid;
-        unsigned magicnumber;
-    } data = {getpid(), 0xdeadbeef};
-    send(client_socket, &data, sizeof(data), 0);
-
-    // Receive message from server
-    unsigned succ;
-    do {
-        recv(client_socket, &succ, sizeof(succ), 0);
-    } while (succ != 0xdeadbeef);
-
-    close(client_socket);
-    return;
+        return portSocket(port_num);
+    return unixDomainSocket(port);
 }
 
-void __attribute__((constructor)) init() { start_client(); }
+static void safe_write(int fd, const void* buf, size_t count) {
+    while (count > 0) {
+        ssize_t written = write(fd, buf, count);
+        if (written < 0) {
+            if (errno == EINTR)
+                continue;
+            perror("write");
+            return;
+        }
+        count -= written;
+        buf = (const char*)buf + written;
+    }
+}
+
+void utraceTime(const unsigned long long rawTime, const char* msg) {
+    if (socketfd == -2)
+        socketfd = startClient();
+    if (socketfd == -1)
+        return;
+    atexit(cleanup);
+    const unsigned long long magic1 = 0x12345678, magic2 = 0x87654321,
+                             magic3 = 0xdeadbeef;
+    safe_write(socketfd, &magic1, sizeof(magic1));
+    safe_write(socketfd, &rawTime, sizeof(rawTime));
+    safe_write(socketfd, &magic2, sizeof(magic2));
+    unsigned long long len = strlen(msg);
+    safe_write(socketfd, &len, sizeof(len));
+    safe_write(socketfd, msg, strlen(msg));
+    safe_write(socketfd, &magic3, sizeof(magic3));
+}
+
+void utrace(const char* msg) {
+    time_t t = time(NULL);
+    utraceTime(t, msg);
+}
