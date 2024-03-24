@@ -32,16 +32,15 @@ nlohmann::json cmdlineData::toJson() const {
     return j;
 }
 
-jsonData::jsonData(const std::string& jsonString, const time_t time)
-    : data(), j(jsonString) {
+stringData::stringData(const std::string& s, const time_t time) : data(), s(s) {
     setTime(time);
 }
 
-nlohmann::json jsonData::toJson() const {
+nlohmann::json stringData::toJson() const {
     using json = nlohmann::json;
     json j;
     j["time"] = getTime();
-    j["json"] = this->j;
+    j["string"] = s;
     return j;
 }
 

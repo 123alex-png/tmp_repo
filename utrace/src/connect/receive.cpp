@@ -3,6 +3,7 @@
 #include <sstream>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <thread>
 
 // implementation of class receive
 
@@ -24,50 +25,55 @@ void receive::watch() {
         if (client < 0)
             throw std::runtime_error("accept failed");
 
-        while (true) {
+        auto deal = [&] (int client) {
+            while (true) {
+                auto output = getOutput();
 
-            auto magichk = [&](unsigned long long MAGIC) {
-                unsigned long long magic;
-                int len = recv(client, &magic, sizeof(magic), 0);
-                if (len == 0)
-                    return 0;
-                if (len < 0)
+                auto magichk = [&](unsigned long long MAGIC) {
+                    unsigned long long magic;
+                    int len = recv(client, &magic, sizeof(magic), 0);
+                    if (len == 0)
+                        return 0;
+                    if (len < 0)
+                        throw std::runtime_error("recv failed");
+                    if (magic != MAGIC)
+                        throw std::runtime_error("invalid magic number");
+                    return len;
+                };
+
+                if (magichk(0x12345678) == 0)
+                    break;
+
+                unsigned long long time;
+                if (recv(client, &time, sizeof(time), 0) < 0)
                     throw std::runtime_error("recv failed");
-                if (magic != MAGIC)
-                    throw std::runtime_error("invalid magic number");
-                return len;
-            };
 
-            if (magichk(0x12345678) == 0)
-                break;
+                if (magichk(0x87654321) == 0)
+                    break;
 
-            unsigned long long time;
-            if (recv(client, &time, sizeof(time), 0) < 0)
-                throw std::runtime_error("recv failed");
-
-            if (magichk(0x87654321) == 0)
-                break;
-
-            long long length;
-            if (recv(client, &length, sizeof(length), 0) < 0)
-                throw std::runtime_error("recv failed");
-            std::stringstream ss;
-            char buffer[1024];
-            while (length > 0) {
-                int n =
-                    recv(client, buffer,
-                         sizeof(buffer) > length ? length : sizeof(buffer), 0);
-                if (n < 0)
+                long long length;
+                if (recv(client, &length, sizeof(length), 0) < 0)
                     throw std::runtime_error("recv failed");
-                ss.write(buffer, n);
-                length -= n;
+                std::stringstream ss;
+                char buffer[1024];
+                while (length > 0) {
+                    int n =
+                        recv(client, buffer,
+                            sizeof(buffer) > length ? length : sizeof(buffer), 0);
+                    if (n < 0)
+                        throw std::runtime_error("recv failed");
+                    ss.write(buffer, n);
+                    length -= n;
+                }
+
+                if (magichk(0xdeadbeef) == 0)
+                    break;
+
+                output->write(stringData(ss.str(), time));
             }
+            close(client);
+        };
 
-            if (magichk(0xdeadbeef) == 0)
-                break;
-
-            jsonData data(ss.str(), time);
-            getOutput()->write(data);
-        }
+        std::thread(deal, client).detach();
     }
 }

@@ -145,14 +145,6 @@ void connection::watch() {
             continue;
         }
 
-        trc->work(data.pid);
-
-        // std::cout << "Attaching to pid " << data.pid << std::endl;
-
-        unsigned succ = 0xdeadbeef;
-        if (send(client, &succ, sizeof(succ), 0) < 0)
-            throw std::runtime_error("send failed");
-        // std::cout << "send " << succ << std::endl;
-        close(client);
+        trc->work(data.pid, client);
     }
 }

@@ -40,12 +40,12 @@ public:
     nlohmann::json toJson() const override;
 };
 
-class jsonData : public data {
+class stringData : public data {
 private:
-    nlohmann::json j;
+    std::string s;
 
 public:
-    jsonData(const std::string &jsonString, const time_t time);
+    stringData(const std::string &s, const time_t time);
     nlohmann::json toJson() const override;
 };
 

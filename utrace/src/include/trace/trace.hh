@@ -67,6 +67,6 @@ private:
 public:
     trace(const std::vector<stream>& streams, bool cmdlineOutput, output* out,
           dbgType debuggerType);
-    void work(const pid_t& pid);
+    void work(const pid_t& pid, const int sockfd);
     output* getOutput();
 };

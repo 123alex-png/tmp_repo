@@ -1,5 +1,4 @@
-#include <condition_variable>
-#include <mutex>
+#include <sys/socket.h>
 #include <thread>
 #include <trace/gdb.hh>
 #include <trace/trace.hh>
@@ -48,16 +47,23 @@ trace::trace(const std::vector<stream>& streams, bool cmdlineOutput,
     : cmdlineOutput(cmdlineOutput), streams(streams), debuggerType(dbg),
       out(out) {}
 
-void trace::work(const pid_t& pid) {
+void trace::work(const pid_t& pid, const int sockfd) {
+
+    auto cleanUpSocket = [&]() {
+        unsigned succ = 0xdeadbeef;
+        if (send(sockfd, &succ, sizeof(succ), 0) < 0)
+            throw std::runtime_error("send failed");
+        // std::cout << "send " << succ << std::endl;
+        close(sockfd);
+    };
+
     if (cmdlineOutput)
         out->write(cmdlineData(pid));
 
-    if (streams.empty())
+    if (streams.empty()) {
+        cleanUpSocket();
         return;
-
-    std::mutex mutex;
-    std::condition_variable cv;
-    bool ready = false;
+    }
 
     auto exeRun = [&]() {
         debugger* dbg = nullptr;
@@ -76,11 +82,9 @@ void trace::work(const pid_t& pid) {
             breakpoints.insert({stream.getBreakPoint(), stream});
         }
 
-        {
-            std::unique_lock<std::mutex> lock(mutex);
-            ready = true;
-            cv.notify_all();
-        }
+        // std::cout << "Attaching to pid " << data.pid << std::endl;
+
+        cleanUpSocket();
 
         while (1) {
             auto [reason, breakpoint] = dbg->continueExec();
@@ -101,12 +105,6 @@ void trace::work(const pid_t& pid) {
     };
 
     std::thread t(exeRun);
-
-    {
-        std::unique_lock<std::mutex> lock(mutex);
-        while (!ready)
-            cv.wait(lock);
-    }
 
     t.detach();
     return;
