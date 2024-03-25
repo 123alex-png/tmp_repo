@@ -15,6 +15,7 @@ public:
 class connection {
 private:
     std::string name;
+    std::vector<std::string> whiteList;
     std::vector<std::string> args;
     processFilter* filter;
     trace* trc;
@@ -26,9 +27,9 @@ protected:
     output* getOutput();
 
 public:
-    connection(const std::string& name, const std::vector<std::string>& args,
+    connection(const std::string& name, const std::vector<std::string> &whiteList, const std::vector<std::string>& args,
                processFilter* filter, trace* trc, int maxClient, int port);
-    connection(const std::string& name, const std::vector<std::string>& args,
+    connection(const std::string& name, const std::vector<std::string> &whiteList, const std::vector<std::string>& args,
                processFilter* filter, trace* trc, int maxClient, const std::string& path);
     virtual void watch();
 };

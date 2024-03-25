@@ -51,7 +51,7 @@ void trace::work(const pid_t& pid, const int sockfd) {
 
     auto cleanUpSocket = [&]() {
         unsigned succ = 0xdeadbeef;
-        if (send(sockfd, &succ, sizeof(succ), 0) < 0)
+        if (send(sockfd, &succ, sizeof(succ), 0) != sizeof(succ))
             throw std::runtime_error("send failed");
         // std::cout << "send " << succ << std::endl;
         close(sockfd);

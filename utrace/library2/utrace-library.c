@@ -4,11 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <sys/un.h>
 #include <time.h>
 #include <unistd.h>
 
 static int socketfd = -2;
+
+static const unsigned long long magic1 = 0x12345678, magic2 = 0x87654321,
+                                magic3 = 0xdeadbeef;
 
 static void cleanup() {
     if (socketfd >= 0)
@@ -55,17 +59,6 @@ static int unixDomainSocket(const char* port) {
     return client_socket;
 }
 
-static int startClient() {
-    const char* port = getenv("UTRACE_PORT");
-    if (!port)
-        return -1;
-    char* endptr = NULL;
-    int port_num = strtol(port, &endptr, 10);
-    if (endptr && endptr[0] == '\0')
-        return portSocket(port_num);
-    return unixDomainSocket(port);
-}
-
 static void safe_write(int fd, const void* buf, size_t count) {
     while (count > 0) {
         ssize_t written = write(fd, buf, count);
@@ -80,14 +73,40 @@ static void safe_write(int fd, const void* buf, size_t count) {
     }
 }
 
+static int startClient() {
+    const char* port = getenv("UTRACE_PORT");
+    if (!port)
+        return -1;
+    char* endptr = NULL;
+    int port_num = strtol(port, &endptr, 10);
+    int socketfd = -1;
+    if (endptr && endptr[0] == '\0')
+        socketfd = portSocket(port_num);
+    else
+        socketfd = unixDomainSocket(port);
+    if (socketfd == -1)
+        perror("socket");
+    else {
+        atexit(cleanup);
+        safe_write(socketfd, &magic1, sizeof(magic1));
+        pid_t pid = getpid();
+        safe_write(socketfd, &pid, sizeof(pid));
+    }
+
+    // Receive message from server
+    unsigned succ;
+    do {
+        recv(socketfd, &succ, sizeof(succ), 0);
+    } while (succ != 0x12345678);
+    return socketfd;
+}
+
 void utraceTime(const unsigned long long rawTime, const char* msg) {
     if (socketfd == -2)
         socketfd = startClient();
     if (socketfd == -1)
         return;
-    atexit(cleanup);
-    const unsigned long long magic1 = 0x12345678, magic2 = 0x87654321,
-                             magic3 = 0xdeadbeef;
+
     safe_write(socketfd, &magic1, sizeof(magic1));
     safe_write(socketfd, &rawTime, sizeof(rawTime));
     safe_write(socketfd, &magic2, sizeof(magic2));

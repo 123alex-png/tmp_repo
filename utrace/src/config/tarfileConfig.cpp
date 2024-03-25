@@ -15,11 +15,11 @@ tarfileConfig::tarfileConfig(output* out, const std::string& portFile)
     connection* conn = nullptr;
     try {
         int port = std::stoi(portFile);
-        conn = new connection("tarfile", {"tar"}, new simpleProcessFilter(),
-                              trc, 1, port);
+        conn = new connection("tarfile", {"tar"}, {"tar"},
+                              new simpleProcessFilter(), trc, 1, port);
     } catch (const std::invalid_argument& e) {
-        conn = new connection("tarfile", {"tar"}, new simpleProcessFilter(),
-                              trc, 1, portFile);
+        conn = new connection("tarfile", {"tar"}, {"tar"},
+                              new simpleProcessFilter(), trc, 1, portFile);
     }
     setConnect(conn);
 }

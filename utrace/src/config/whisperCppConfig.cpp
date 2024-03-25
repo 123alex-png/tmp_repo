@@ -2,21 +2,6 @@
 #include <fstream>
 #include <sstream>
 
-bool whisperCppCheck::check(const pid_t& pid) {
-    std::ifstream file("/proc/" + std::to_string(pid) + "/comm");
-    if (!file.is_open())
-        return false;
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    std::string comm = buffer.str();
-    comm.erase(comm.find_last_not_of(" \n\r\t") + 1);
-    if (comm.find("stream") != std::string::npos)
-        return true;
-    if (comm.find("main") != std::string::npos)
-        return true;
-    return false;
-}
-
 whisperCppConfig::whisperCppConfig(output* out, const std::string& portFile)
     : config(out) {
     std::vector<stream> streams;
@@ -29,11 +14,11 @@ whisperCppConfig::whisperCppConfig(output* out, const std::string& portFile)
     connection* conn = nullptr;
     try {
         int port = std::stoi(portFile);
-        conn = new connection("whisper.cpp", {}, new whisperCppCheck(), trc, 1,
-                              port);
+        conn = new connection("whisper.cpp", {"stream", "main"}, {},
+                              new simpleProcessFilter(), trc, 1, port);
     } catch (const std::invalid_argument& e) {
-        conn = new connection("whisper.cpp", {}, new whisperCppCheck(), trc, 1,
-                              portFile);
+        conn = new connection("whisper.cpp", {"stream", "main"}, {},
+                              new simpleProcessFilter(), trc, 1, portFile);
     }
     setConnect(conn);
 }

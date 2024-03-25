@@ -19,11 +19,23 @@ bool simpleProcessFilter::check(const int& pid) { return true; }
 // implementation of class connection
 
 bool connection::check(const pid_t& pid) {
-    std::vector<std::string> arguments;
-    std::ifstream file("/proc/" + std::to_string(pid) + "/cmdline");
-    if (file.is_open()) {
+    std::ifstream comm("/proc/" + std::to_string(pid) + "/cmdline");
+    if (comm.is_open()) {
         std::stringstream buffer;
-        buffer << file.rdbuf();
+        buffer << comm.rdbuf();
+        std::string comm = buffer.str();
+        for (auto& s : whiteList)
+            if (comm.find(s) != std::string::npos)
+                return true;
+        return false;
+    } else
+        return false;
+
+    std::vector<std::string> arguments;
+    std::ifstream cmdline("/proc/" + std::to_string(pid) + "/cmdline");
+    if (cmdline.is_open()) {
+        std::stringstream buffer;
+        buffer << cmdline.rdbuf();
 
         std::string cmdline = buffer.str();
         std::istringstream iss(cmdline);
@@ -32,7 +44,8 @@ bool connection::check(const pid_t& pid) {
         while (getline(iss, argument, '\0')) {
             arguments.push_back(argument);
         }
-    }
+    } else
+        return false;
     for (const auto& arg : args) {
         bool flag = false;
         for (const auto& argument : arguments) {
@@ -56,10 +69,12 @@ output* connection::getOutput() { return trc->getOutput(); }
 
 // portSocket
 connection::connection(const std::string& name,
+                       const std::vector<std::string>& whiteList,
                        const std::vector<std::string>& args,
                        processFilter* filter, trace* trc, int maxClient,
                        int port)
-    : name(name), args(args), filter(filter), trc(trc), maxClient(maxClient) {
+    : name(name), whiteList(whiteList), args(args), filter(filter), trc(trc),
+      maxClient(maxClient) {
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0)
         throw std::runtime_error("socket");
@@ -82,10 +97,12 @@ connection::connection(const std::string& name,
 
 // unixDomainSocket
 connection::connection(const std::string& name,
+                       const std::vector<std::string>& whiteList,
                        const std::vector<std::string>& args,
                        processFilter* filter, trace* trc, int maxClient,
                        const std::string& path)
-    : name(name), args(args), filter(filter), trc(trc), maxClient(maxClient) {
+    : name(name), whiteList(whiteList), args(args), filter(filter), trc(trc),
+      maxClient(maxClient) {
     // Create a UNIX domain socket
     sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
     if (sockfd == -1)
