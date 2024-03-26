@@ -6,6 +6,7 @@
 #include <sys/un.h>
 #include <unistd.h>
 
+/*
 static int portSocket(int port) {
     // Create socket for client
     int client_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -25,6 +26,7 @@ static int portSocket(int port) {
     }
     return client_socket;
 }
+*/
 
 static int unixDomainSocket(const char* port) {
     int client_socket = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -46,6 +48,7 @@ static int unixDomainSocket(const char* port) {
 }
 
 static void start_client() {
+    /*
     const char* port = getenv("UTRACE_PORT");
     if (!port)
         return;
@@ -56,6 +59,10 @@ static void start_client() {
         client_socket = portSocket(port_num);
     else
         client_socket = unixDomainSocket(port);
+    if (client_socket == -1)
+        return;
+    */
+    int client_socket = unixDomainSocket("/tmp/utrace.sock");
     if (client_socket == -1)
         return;
     // Send message to server

@@ -20,26 +20,6 @@ static void cleanup() {
     socketfd = -2;
 }
 
-static int portSocket(int port) {
-    // Create socket for client
-    int client_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (client_socket < 0) {
-        perror("socket");
-        return -1;
-    }
-    // Connect to server
-    struct sockaddr_in server_address;
-    server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(port);
-    server_address.sin_addr.s_addr = INADDR_ANY;
-    if (connect(client_socket, (struct sockaddr*)&server_address,
-                sizeof(server_address)) < 0) {
-        perror("connect");
-        return -1;
-    }
-    return client_socket;
-}
-
 static int unixDomainSocket(const char* port) {
     int client_socket = socket(AF_UNIX, SOCK_STREAM, 0);
     if (client_socket == -1)
@@ -74,7 +54,7 @@ static void safe_write(int fd, const void* buf, size_t count) {
 }
 
 static int startClient() {
-    const char* port = getenv("UTRACE_PORT");
+    /*const char* port = "/tmp/utrace.sock";
     if (!port)
         return -1;
     char* endptr = NULL;
@@ -83,7 +63,9 @@ static int startClient() {
     if (endptr && endptr[0] == '\0')
         socketfd = portSocket(port_num);
     else
-        socketfd = unixDomainSocket(port);
+        socketfd = unixDomainSocket(port);*/
+
+    int socketfd = unixDomainSocket("/tmp/utrace.sock");
     if (socketfd == -1)
         perror("socket");
     else {

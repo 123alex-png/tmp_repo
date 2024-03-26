@@ -24,10 +24,14 @@ bool connection::check(const pid_t& pid) {
         std::stringstream buffer;
         buffer << comm.rdbuf();
         std::string comm = buffer.str();
+        bool flag = false;
         for (auto& s : whiteList)
-            if (comm.find(s) != std::string::npos)
-                return true;
-        return false;
+            if (comm.find(s) != std::string::npos){
+                flag = true;
+                break;
+            }
+        if(!flag)
+            return false;
     } else
         return false;
 

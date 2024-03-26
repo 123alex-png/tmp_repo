@@ -10,7 +10,7 @@ int main(int argc, const char* argv[]) {
     po::options_description desc("Allowed options");
 
     int pid = 0;
-    std::string portFile = "";
+    std::string portFile = "/tmp/utrace.sock";
     std::string configFile = "";
     std::string outputFile = "";
     std::vector<std::string> exec;
@@ -19,7 +19,6 @@ int main(int argc, const char* argv[]) {
     desc.add_options()
         ("help", "produce help message")
         ("config,c", po::value<std::string>(&configFile),"set config file")
-        ("port,l", po::value<std::string>(&portFile), "set port to be listened")
         ("output,o", po::value<std::string>(&outputFile), "set output file");
     // clang-format on
 
@@ -35,11 +34,6 @@ int main(int argc, const char* argv[]) {
         std::cout << "Config file: " << configFile << std::endl;
     } else
         std::cout << "No config file was set." << std::endl;
-
-    if (vm.count("port")) {
-        std::cout << "Port: " << portFile << std::endl;
-    } else
-        throw std::invalid_argument("Port file is required");
 
     output* out = nullptr;
     if (vm.count("output")) {
