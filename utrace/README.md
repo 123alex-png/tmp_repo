@@ -24,23 +24,13 @@ To install utrace, follow these steps:
 
 utrace provides the following options:
 
-- `--config, -c [filename]`: Specifies the config file (Now simplified as a number for target config).
-
-    No config file means only catpure command line.
-- `--pid, -p [pid]`: Attaches to an existing process.
-- `--exec, -e [commands]`: Runs a process from here.
-- `--port, -p [port]`: Listens to a port, waiting for a process calling it to hook.
-- `--output`: Set output file. [TODO]
-
-The process uses pid first, followed by exec, and then port. When nothing is input, the default will be used, where access NETLINK is needed. Note that except for --exec, super user's privilege is needed. 
+- `--help, -h`: Show help information.
 
 Example usage:
 
 ```
-./utrace --config 1 --pid 1234
-./utrace --config 2 --exec ./myProgram 
-./utrace --config 3 --port 1145
-./utrace --config 3
+./utrace
+./utrace --help
 ```
 
 

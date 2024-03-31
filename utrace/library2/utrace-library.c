@@ -11,9 +11,6 @@
 
 static int socketfd = -2;
 
-static const unsigned long long magic1 = 0x12345678, magic2 = 0x87654321,
-                                magic3 = 0xdeadbeef;
-
 static void cleanup() {
     if (socketfd >= 0)
         close(socketfd);
@@ -53,41 +50,49 @@ static void safe_write(int fd, const void* buf, size_t count) {
     }
 }
 
-static int startClient() {
-    /*const char* port = "/tmp/utrace.sock";
-    if (!port)
-        return -1;
-    char* endptr = NULL;
-    int port_num = strtol(port, &endptr, 10);
-    int socketfd = -1;
-    if (endptr && endptr[0] == '\0')
-        socketfd = portSocket(port_num);
-    else
-        socketfd = unixDomainSocket(port);*/
-
-    int socketfd = unixDomainSocket("/tmp/utrace.sock");
-    if (socketfd == -1)
-        perror("socket");
-    else {
-        atexit(cleanup);
-        safe_write(socketfd, &magic1, sizeof(magic1));
-        pid_t pid = getpid();
-        safe_write(socketfd, &pid, sizeof(pid));
+static void safe_read(int fd, void* buf, size_t count) {
+    while (count > 0) {
+        ssize_t read_bytes = read(fd, buf, count);
+        if (read_bytes < 0) {
+            if (errno == EINTR)
+                continue;
+            perror("read");
+            return;
+        }
+        count -= read_bytes;
+        buf = (char*)buf + read_bytes;
     }
+}
+
+static int start_client() {
+    int client_socket = unixDomainSocket("/tmp/utrace.sock");
+    if (client_socket == -1)
+        return -1;
+    // Send message to server
+    struct {
+        int pid;
+        unsigned magicnumber;
+    } data = {getpid(), 0xdeadbeef};
+    safe_write(client_socket, &data, sizeof(data));
 
     // Receive message from server
     unsigned succ;
     do {
-        recv(socketfd, &succ, sizeof(succ), 0);
-    } while (succ != 0x12345678);
-    return socketfd;
+        safe_read(client_socket, &succ, sizeof(succ));
+    } while (succ != 0xdeadbeef);
+
+    atexit(cleanup);
+    return client_socket;
 }
 
 void utraceTime(const unsigned long long rawTime, const char* msg) {
     if (socketfd == -2)
-        socketfd = startClient();
+        socketfd = start_client();
     if (socketfd == -1)
         return;
+
+    static const unsigned long long magic1 = 0x12345678, magic2 = 0x87654321,
+                                    magic3 = 0xdeadbeef;
 
     safe_write(socketfd, &magic1, sizeof(magic1));
     safe_write(socketfd, &rawTime, sizeof(rawTime));

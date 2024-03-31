@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <nlohmann/json.hpp>
+#include <memory>
 
 class data {
 private:

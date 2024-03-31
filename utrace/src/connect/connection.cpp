@@ -1,3 +1,4 @@
+#include <config/config.hh>
 #include <connection/connection.hh>
 #include <cstring>
 #include <fcntl.h>
@@ -8,105 +9,40 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/un.h>
+#include <thread>
 #include <unistd.h>
 
 using std::string;
 
-// implementation of class simpleProcessFilter
-
-bool simpleProcessFilter::check(const int& pid) { return true; }
-
 // implementation of class connection
 
-bool connection::check(const pid_t& pid) {
-    std::ifstream comm("/proc/" + std::to_string(pid) + "/cmdline");
-    if (comm.is_open()) {
-        std::stringstream buffer;
-        buffer << comm.rdbuf();
-        std::string comm = buffer.str();
-        bool flag = false;
-        for (auto& s : whiteList)
-            if (comm.find(s) != std::string::npos){
-                flag = true;
-                break;
-            }
-        if(!flag)
-            return false;
-    } else
-        return false;
+std::string connection::getConfig(const pid_t& pid) {
+    std::string cwdfile = "/proc/" + std::to_string(pid) + "/cwd";
+    static char buffer[4096];
 
-    std::vector<std::string> arguments;
-    std::ifstream cmdline("/proc/" + std::to_string(pid) + "/cmdline");
-    if (cmdline.is_open()) {
-        std::stringstream buffer;
-        buffer << cmdline.rdbuf();
+    // Read the symbolic link pointing to the current working directory
+    ssize_t len = readlink(cwdfile.c_str(), buffer, sizeof(buffer) - 1);
 
-        std::string cmdline = buffer.str();
-        std::istringstream iss(cmdline);
-        std::string argument;
+    if (len == -1)
+        throw std::runtime_error("readlink");
 
-        while (getline(iss, argument, '\0')) {
-            arguments.push_back(argument);
-        }
-    } else
-        return false;
-    for (const auto& arg : args) {
-        bool flag = false;
-        for (const auto& argument : arguments) {
-            if (argument.find(arg) != std::string::npos) {
-                flag = true;
-                break;
-            }
-        }
-        if (!flag)
-            return false;
+    buffer[len] = '\0';
+    std::string path = std::string(buffer);
+
+    // search the "utrace-config.json" file in the current working directory
+    while (true) {
+        std::string configPath = path + "/utrace-config.json";
+        if (std::filesystem::exists(configPath))
+            return configPath;
+        if (path == "/")
+            break;
+        path = std::filesystem::path(path).parent_path();
     }
-
-    if (!filter->check(pid))
-        return false;
-
-    return true;
+    throw std::runtime_error("utrace-config.json not found");
 }
 
-int connection::getSockfd() { return sockfd; }
-output* connection::getOutput() { return trc->getOutput(); }
-
-// portSocket
-connection::connection(const std::string& name,
-                       const std::vector<std::string>& whiteList,
-                       const std::vector<std::string>& args,
-                       processFilter* filter, trace* trc, int maxClient,
-                       int port)
-    : name(name), whiteList(whiteList), args(args), filter(filter), trc(trc),
-      maxClient(maxClient) {
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0)
-        throw std::runtime_error("socket");
-
-    struct sockaddr_in addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(port);
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    if (bind(sockfd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        perror("bind");
-        throw std::runtime_error("bind");
-    }
-
-    if (listen(sockfd, maxClient) < 0)
-        throw std::runtime_error("listen");
-
-    std::cout << "Listening on port " << port << std::endl;
-}
-
-// unixDomainSocket
-connection::connection(const std::string& name,
-                       const std::vector<std::string>& whiteList,
-                       const std::vector<std::string>& args,
-                       processFilter* filter, trace* trc, int maxClient,
-                       const std::string& path)
-    : name(name), whiteList(whiteList), args(args), filter(filter), trc(trc),
-      maxClient(maxClient) {
+connection::connection(int maxClient, const std::string& path)
+    : maxClient(maxClient) {
     // Create a UNIX domain socket
     sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
     if (sockfd == -1)
@@ -149,23 +85,28 @@ void connection::watch() {
         if (client < 0)
             throw std::runtime_error("accept failed");
 
-        struct {
-            int pid;
-            unsigned magicnumber;
-        } data;
-        if (recv(client, &data, sizeof(data), 0) < 0)
-            throw std::runtime_error("recv failed");
-        if (data.magicnumber != 0xdeadbeef)
-            throw std::runtime_error("invalid magic number");
+        auto work = [&](int client) {
+            struct {
+                int pid;
+                unsigned magicnumber;
+            } data;
+            if (recv(client, &data, sizeof(data), 0) < 0)
+                throw std::runtime_error("recv failed");
+            if (data.magicnumber != 0xdeadbeef)
+                throw std::runtime_error("invalid magic number");
 
-        if (!check(data.pid)) {
-            unsigned fail = 0xdeadbeef;
-            if (send(client, &fail, sizeof(fail), 0) < 0)
-                throw std::runtime_error("send failed");
-            close(client);
-            continue;
-        }
+            config cfg = config(getConfig(data.pid));
 
-        trc->work(data.pid, client);
+            if (!cfg.check(data.pid)) {
+                unsigned fail = 0xdeadbeef;
+                if (send(client, &fail, sizeof(fail), 0) < 0)
+                    throw std::runtime_error("send failed");
+                close(client);
+                return;
+            }
+            cfg.getTrace()->work(data.pid, client);
+        };
+
+        std::thread(work, client).detach();
     }
 }

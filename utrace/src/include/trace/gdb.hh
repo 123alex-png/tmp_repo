@@ -2,7 +2,7 @@
 
 #include <boost/process.hpp>
 #include <boost/process/io.hpp>
-#include <trace/trace.hh>
+#include <trace/debugger-trace.hh>
 
 class gdb : public debugger {
 private:
@@ -32,4 +32,11 @@ public:
 
     std::pair<std::string, std::string> continueExec() override;
 
+};
+
+class gdbTrace : public debuggerTrace {
+protected:
+    std::unique_ptr<debugger> getDebugger(pid_t pid) override;
+public:
+    gdbTrace(bool cmdlineOutput, std::shared_ptr<output> out, const std::vector<stream>& streams);
 };

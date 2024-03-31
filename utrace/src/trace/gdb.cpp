@@ -143,3 +143,12 @@ std::pair<std::string, std::string> gdb::continueExec() {
     } while (reason.empty());
     return {reason, ""};
 }
+
+// gdbTrace implementation
+std::unique_ptr<debugger> gdbTrace::getDebugger(pid_t pid) {
+    return std::make_unique<gdb>(pid);
+}
+
+gdbTrace::gdbTrace(bool cmdlineOutput, std::shared_ptr<output> out,
+                   const std::vector<stream>& streams)
+    : debuggerTrace(cmdlineOutput, out, streams) {}

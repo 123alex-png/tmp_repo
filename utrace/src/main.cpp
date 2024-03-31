@@ -1,25 +1,16 @@
 #include <boost/program_options.hpp>
 #include <cassert>
-#include <config/config.hh>
+#include <connection/connection.hh>
 #include <iostream>
-#include <output/output.hh>
 
 int main(int argc, const char* argv[]) {
     std::cout << "Hello, world!" << std::endl;
     namespace po = boost::program_options;
     po::options_description desc("Allowed options");
 
-    int pid = 0;
-    std::string portFile = "/tmp/utrace.sock";
-    std::string configFile = "";
-    std::string outputFile = "";
-    std::vector<std::string> exec;
-
     // clang-format off
     desc.add_options()
-        ("help", "produce help message")
-        ("config,c", po::value<std::string>(&configFile),"set config file")
-        ("output,o", po::value<std::string>(&outputFile), "set output file");
+        ("help", "produce help message");
     // clang-format on
 
     po::variables_map vm;
@@ -30,22 +21,8 @@ int main(int argc, const char* argv[]) {
         std::cout << desc << std::endl;
         return 1;
     }
-    if (vm.count("config")) {
-        std::cout << "Config file: " << configFile << std::endl;
-    } else
-        std::cout << "No config file was set." << std::endl;
 
-    output* out = nullptr;
-    if (vm.count("output")) {
-        std::cout << "Output: " << outputFile << std::endl;
-        out = new output(outputFile);
-    } else
-        out = new output();
-
-    configInit* simpleConfigInitialize =
-        new configInit(configFile, portFile, out);
-    config* cfg = simpleConfigInitialize->getConfig();
-    connection* conn = cfg->getConnect();
-    conn->watch();
+    connection conn(1, "/tmp/utrace.sock");
+    conn.watch();
     return 0;
 }

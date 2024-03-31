@@ -6,27 +6,33 @@
 #include <sys/un.h>
 #include <unistd.h>
 
-/*
-static int portSocket(int port) {
-    // Create socket for client
-    int client_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (client_socket < 0) {
-        perror("socket");
-        return -1;
+static void safe_write(int fd, const void* buf, size_t count) {
+    while (count > 0) {
+        ssize_t written = write(fd, buf, count);
+        if (written < 0) {
+            if (errno == EINTR)
+                continue;
+            perror("write");
+            return;
+        }
+        count -= written;
+        buf = (const char*)buf + written;
     }
-    // Connect to server
-    struct sockaddr_in server_address;
-    server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(port);
-    server_address.sin_addr.s_addr = INADDR_ANY;
-    if (connect(client_socket, (struct sockaddr*)&server_address,
-                sizeof(server_address)) < 0) {
-        perror("connect");
-        return -1;
-    }
-    return client_socket;
 }
-*/
+
+static void safe_read(int fd, void* buf, size_t count) {
+    while (count > 0) {
+        ssize_t read_bytes = read(fd, buf, count);
+        if (read_bytes < 0) {
+            if (errno == EINTR)
+                continue;
+            perror("read");
+            return;
+        }
+        count -= read_bytes;
+        buf = (char*)buf + read_bytes;
+    }
+}
 
 static int unixDomainSocket(const char* port) {
     int client_socket = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -48,20 +54,7 @@ static int unixDomainSocket(const char* port) {
 }
 
 static void start_client() {
-    /*
-    const char* port = getenv("UTRACE_PORT");
-    if (!port)
-        return;
-    char* endptr = NULL;
-    int port_num = strtol(port, &endptr, 10);
-    int client_socket = -1;
-    if (endptr && endptr[0] == '\0')
-        client_socket = portSocket(port_num);
-    else
-        client_socket = unixDomainSocket(port);
-    if (client_socket == -1)
-        return;
-    */
+    printf("Client started\n");
     int client_socket = unixDomainSocket("/tmp/utrace.sock");
     if (client_socket == -1)
         return;
@@ -70,12 +63,12 @@ static void start_client() {
         int pid;
         unsigned magicnumber;
     } data = {getpid(), 0xdeadbeef};
-    send(client_socket, &data, sizeof(data), 0);
+    safe_write(client_socket, &data, sizeof(data));
 
     // Receive message from server
     unsigned succ;
     do {
-        recv(client_socket, &succ, sizeof(succ), 0);
+        safe_read(client_socket, &succ, sizeof(succ));
     } while (succ != 0xdeadbeef);
 
     close(client_socket);
