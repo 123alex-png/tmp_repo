@@ -1,0 +1,27 @@
+<launch>
+    <arg name="way_point_directory" default="/home/cs504/px4_catkin_ws/src/application/uav_control/data/waypoint.txt"/>
+    <group ns="uav0">
+        <node pkg="uav_control" type="uav_control" name="uav0" output="screen"/>
+        <param name="uav_id" type="int" value="0"/>
+        <param name="uav_name" type="string" value="uav_1"/>
+        <param name="power" type="double" value="3000"/>
+        <param name="state_pub_interval" type="double" value="1"/>
+        <param name="velocity_size" type="double" value="5"/>
+        <param name="x" type="double" value="6"/>
+        <param name="y" type="double" value="4"/>
+        <param name="z" type="double" value="0.1"/>
+        <param name="way_point_directory" value="$(arg way_point_directory)"/>
+    </group>
+    <group ns="uav1">
+        <node pkg="uav_control" type="uav_control" name="uav1" output="screen"/>
+        <param name="uav_id" type="int" value="1"/>
+         <param name="uav_name" type="string" value="uav_2"/>
+        <param name="max_flight_time" type="double" value="1800"/>
+        <param name="state_pub_interval" type="double" value="1"/>
+        <param name="velocity_size" type="double" value="5"/>
+        <param name="x" type="double" value="-10"/>
+        <param name="y" type="double" value="0"/>
+        <param name="z" type="double" value="0"/>
+         <param name="way_point_directory" value="$(arg way_point_directory)"/>
+    </group>
+</launch>
