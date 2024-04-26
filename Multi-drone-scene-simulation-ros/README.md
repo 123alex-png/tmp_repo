@@ -12,14 +12,6 @@
 
   存放场景对应的任务文件
 
-- /model
-
-  存放用于路径规划的强化学习的模型文件
-
-- /docs
-
-  存放本项目的相关文档
-
 - /src
 
   存放本项目的功能包代码
@@ -100,50 +92,6 @@
 
   ![](scene-simulation/preview/电子地图.png)
 
-### 三、依赖介绍
-
-- ROS
-  
-  对应的ROS版本为ros neotic
-  
-- python
-  
-  对应的python版本为3.8，具体依赖见requirements.txt
-  
-- Qt
-
-  Qt版本为5.12.12
-
-- mavros
-
-  ```
-  sudo apt-get install ros-noetic-mavros ros-noetic-mavros-extras wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh
-  ```
-  
-  ```
-  chmod +x install_geographiclib_datasets.sh
-  ```
-  
-  ```
-  sudo ./install_geographiclib_datasets.sh
-  ```
-
-- PX4
-  
-  PX4版本为v1.12.3
-  
-  ```
-  git clone -b v1.12.3 https://github.com/PX4/PX4-Autopilot.git --recursive
-  ```
-  
-  在安装完px4后，还需做一点修改：
-  
-  1. 为调用搭载传感器的无人机模型：将single_vehicle_spawn_highway.launch放入PX4的launch文件夹下。
-  2. 为在ROS中正确获取传感器topic：在传感器的sdf文件中加入\<robotNamespace>,使其获得默认的命名前缀，参见p450_stereo_camera.sdf文件，注意请不要使用model://这种方式组合无人机模型和传感器模型，可能会导致mavros连不上。
-  3. （可以酌情使用）若要使用非PX4自带的机架模型，需要在/PX4-Autopilot/ROMFS/px4fmu_common/init.d-posix文件夹下加入对应的airframes，如1045_p450,如果这之后还报错，可以在.ros文件夹下检查对应的/etc/init.d-posix文件中是否存在对应的airframes。
-
-### 备注
-由于github单个文件100M的限制，uav_control/models/brige0714/meshes下的dae文件和view_point_plan/scripts/data下的pth文件进行了压缩，直接解压即可。
 
 ### 地面站系统
 
