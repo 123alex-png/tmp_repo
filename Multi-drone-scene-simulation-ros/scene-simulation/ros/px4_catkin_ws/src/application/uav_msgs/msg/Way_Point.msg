@@ -1,2 +1,0 @@
-uint16 id
-geometry_msgs/Point32 way_point_pos

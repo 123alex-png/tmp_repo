@@ -1,1 +1,0 @@
-bool is_last_task # Is it currently the last task
