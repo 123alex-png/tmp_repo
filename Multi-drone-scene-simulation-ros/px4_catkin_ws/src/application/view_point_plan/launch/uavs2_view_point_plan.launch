@@ -1,0 +1,18 @@
+<launch>
+<arg name="subTask_filename" default=""/>
+<arg name="obstacles_filename" default=""/>
+   <group ns="uav0">
+        <node pkg="view_point_plan" type="cal_path.py" name="view_plan" output="screen"/>
+        <param name="uav_id" type="int" value="0"/>
+ 	<param name="subTask_filename" value="$(arg subTask_filename)"/>
+        <param name="obstacles_filename" value="$(arg obstacles_filename)"/>
+    </group>
+   <group ns="uav1">
+        <node pkg="view_point_plan" type="cal_path.py" name="view_plan" output="screen"/>
+        <param name="uav_id" type="int" value="1"/>
+        <param name="subTask_filename" value="$(arg subTask_filename)"/>
+        <param name="obstacles_filename" value="$(arg obstacles_filename)"/>
+    </group>
+</launch>
+
+

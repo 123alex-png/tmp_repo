@@ -1,0 +1,8 @@
+<launch>
+        <node pkg="uav_control" type="uav_control" name="uav0" output="screen"/>
+        <param name="uav_id" type="int" value="0"/>
+        <param name="uav_name" type="string" value="uav_1"/>
+        <param name="max_flight_time" type="double" value="1800"/>
+        <param name="state_pub_interval" type="double" value="2"/>
+        <param name="velocity_size" type="double" value="1"/>
+</launch>

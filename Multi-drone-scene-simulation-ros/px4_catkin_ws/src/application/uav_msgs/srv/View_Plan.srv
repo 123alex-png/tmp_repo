@@ -1,0 +1,4 @@
+TASK_State task
+---
+float32 path_length
+geometry_msgs/Point32[] task_path

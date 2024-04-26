@@ -1,0 +1,64 @@
+<launch>
+   <group ns="uav0">
+        <node pkg="task_allocation" type="uav_bid.py" name="bid" output="screen"/>
+        <param name="uav_id" type="int" value="0"/>
+    </group>
+   <group ns="uav1">
+        <node pkg="task_allocation" type="uav_bid.py" name="bid" output="screen"/>
+        <param name="uav_id" type="int" value="1"/>
+    </group>
+   <group ns="uav2">
+        <node pkg="task_allocation" type="uav_bid.py" name="bid" output="screen"/>
+        <param name="uav_id" type="int" value="2"/>
+    </group>
+   <group ns="uav3">
+        <node pkg="task_allocation" type="uav_bid.py" name="bid" output="screen"/>
+        <param name="uav_id" type="int" value="3"/>
+    </group>
+   <group ns="uav4">
+        <node pkg="task_allocation" type="uav_bid.py" name="bid" output="screen"/>
+        <param name="uav_id" type="int" value="4"/>
+    </group>
+    <group ns="uav5">
+        <node pkg="task_allocation" type="uav_bid.py" name="bid" output="screen"/>
+        <param name="uav_id" type="int" value="5"/>
+    </group>
+    <group ns="uav6">
+        <node pkg="task_allocation" type="uav_bid.py" name="bid" output="screen"/>
+        <param name="uav_id" type="int" value="6"/>
+    </group>
+    <group ns="uav7">
+        <node pkg="task_allocation" type="uav_bid.py" name="bid" output="screen"/>
+        <param name="uav_id" type="int" value="7"/>
+    </group>
+    <group ns="uav8">
+        <node pkg="task_allocation" type="uav_bid.py" name="bid" output="screen"/>
+        <param name="uav_id" type="int" value="8"/>
+    </group>
+    <group ns="uav9">
+        <node pkg="task_allocation" type="uav_bid.py" name="bid" output="screen"/>
+        <param name="uav_id" type="int" value="9"/>
+    </group>
+    <group ns="uav10">
+        <node pkg="task_allocation" type="uav_bid.py" name="bid" output="screen"/>
+        <param name="uav_id" type="int" value="10"/>
+    </group>
+    <group ns="uav11">
+        <node pkg="task_allocation" type="uav_bid.py" name="bid" output="screen"/>
+        <param name="uav_id" type="int" value="11"/>
+    </group>
+    <group ns="uav12">
+        <node pkg="task_allocation" type="uav_bid.py" name="bid" output="screen"/>
+        <param name="uav_id" type="int" value="12"/>
+    </group>
+    <group ns="uav13">
+        <node pkg="task_allocation" type="uav_bid.py" name="bid" output="screen"/>
+        <param name="uav_id" type="int" value="13"/>
+    </group>
+    <group ns="uav14">
+        <node pkg="task_allocation" type="uav_bid.py" name="bid" output="screen"/>
+        <param name="uav_id" type="int" value="14"/>
+    </group>
+</launch>
+
+
