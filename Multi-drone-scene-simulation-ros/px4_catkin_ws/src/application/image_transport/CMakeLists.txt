@@ -124,7 +124,8 @@ include_directories(
 )
 
 add_executable(image_sub src/image_sub.cpp)
-target_link_libraries(image_sub ${catkin_LIBRARIES})
+target_link_libraries(image_sub ${catkin_LIBRARIES} stdc++fs)
+#target_link_libraries(image_sub stdc++fs)
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}

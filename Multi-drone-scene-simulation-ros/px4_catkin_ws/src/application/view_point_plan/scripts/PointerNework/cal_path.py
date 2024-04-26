@@ -1,4 +1,5 @@
-#!/home/cs504/anaconda3/envs/torch/bin/python
+#!/home/xxx/anaconda3/envs/torch/bin/python  
+#指定合适的python环境
 #coding=utf-8
 
 """
