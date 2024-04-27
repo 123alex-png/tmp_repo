@@ -360,14 +360,17 @@ bool MainWindow::IsFileExist(QString fileName) {
   return false;
 }
 
-// TODO(lzs): 改为通过文件系统选择生成的html文件
 void MainWindow::on_chooseTaskBox_currentIndexChanged(const QString &arg) {
   int currentId = ui->chooseTaskBox->currentData().toInt();
   std::string TaskHtmlPath;
-  TaskHtmlPath =
-      "/home/cs504/px4_catkin_ws/src/application/view_point_plan/scripts/html/"
-      "subTask_" +
-      std::to_string(currentId) + ".html";
+  std::string path = globalTaskFilename.toStdString();
+  int pos = path.rfind("/");
+  path = path.substr(0, pos);
+  pos = path.rfind("/");
+  TaskHtmlPath = path.substr(0, pos - 4) +
+                 "src/application/view_point_plan/scripts/html/"
+                 "subTask_" +
+                 std::to_string(currentId) + ".html";
   if (IsFileExist(QString::fromStdString(TaskHtmlPath))) {
     std::cout << "加载html" << std::endl;
     webview->load(QUrl("file://" + QString::fromStdString(TaskHtmlPath)));
@@ -508,13 +511,18 @@ void MainWindow::displayTaskState(const uav_msgs::Task_List::ConstPtr &msg) {
  * @brief: 显示无人机相机的实时画面
  * @param name: 无人机节点的名字
  */
-// TODO(lzs): 通过cv2直接处理订阅消息或让用户选择图片路径
 void MainWindow::displayImage(const std::string name) {
-  std::string str =
-      "/home/cs504/px4_catkin_ws/image/" + name + "/image_save.jpg";
+  std::string path = globalTaskFilename.toStdString();
+  int pos = path.rfind("/");
+  path = path.substr(0, pos);
+  pos = path.rfind("/");
+  std::string str = path.substr(0, pos - 4) +
+                    "src/application/image_transport/image/" + name +
+                    "/image_save.jpg";
   QString filename = QString::fromStdString(str);
   QImage *img = new QImage(filename);
-  if (name == "uav0") ui->image_label1->setPixmap(QPixmap::fromImage(*img));
+  data / if (name == "uav0")
+             ui->image_label1->setPixmap(QPixmap::fromImage(*img));
   if (name == "uav1") ui->image_label2->setPixmap(QPixmap::fromImage(*img));
   if (name == "uav2") ui->image_label3->setPixmap(QPixmap::fromImage(*img));
   if (name == "uav3") ui->image_label4->setPixmap(QPixmap::fromImage(*img));
