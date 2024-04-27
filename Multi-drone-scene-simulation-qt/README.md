@@ -32,7 +32,7 @@
 
 见下图示意：
 
-![Alt text](base64str)
+![image](base64str)
 
 ##### 4. 点击启动uav节点按钮，等待终端运行
 
