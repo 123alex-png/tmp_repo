@@ -216,7 +216,7 @@
 
 ​		`sudo apt-get install xmlstarlet`
 
-        2. 将view_point_plan/scripts/PointNetwork中cal_path.py中环境变量更改为本机Anaconda位置
+2. 将view_point_plan/scripts/PointNetwork中cal_path.py中环境变量更改为本机Anaconda位置
 
      `#!/home/xxx/anaconda3/envs/torch/bin/python`
 
