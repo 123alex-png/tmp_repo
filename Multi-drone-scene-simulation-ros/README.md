@@ -204,11 +204,11 @@
 
 ​	`~$ pip install -r requirements.txt --ignore-installed`
 
-​	==注意：==
+​	**注意：**
 
-​	==某些包可能会下载失败(由于源的问题或者其他问题导致)==
+​	**某些包可能会下载失败(由于源的问题或者其他问题导致)**
 
-​	==需要单独使用pip或者conda进行安装，并尽可能与requirements中版本号一致==
+​	**需要单独使用pip或者conda进行安装，并尽可能与requirements中版本号一致**
 
 ##### 5. 补充配置
 
@@ -238,11 +238,11 @@
 ~/px4_catkin_ws$ catkin_make -DCATKIN_WHITELIST_PACKAGES=""
 ```
 
-==编译完成后将uav_control中的生成的models文件夹复制至home/.gazebo文件夹中==
+**编译完成后将uav_control中的生成的models文件夹复制至home/.gazebo文件夹中**
 
 #### 2. 部署运行
 
-==以下两者方式均可==
+**以下两者方式均可**
 
 ##### 1. 终端部署运行
 
