@@ -138,7 +138,7 @@
 
 6. 编译完成显示以下说明编译成功：
 
-   ![image-20240426110052354](C:\Users\liangzx\AppData\Roaming\Typora\typora-user-images\image-20240426110052354.png)
+   ![image](img/1.png)
 
 7. 将px4路径添加入环境变量：
 
