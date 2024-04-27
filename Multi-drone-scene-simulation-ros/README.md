@@ -297,15 +297,15 @@
 ### goto->3.开始执行任务rosrun start_execute_task start_execute_task
 ```
 
-==可结合项目配套演示视频《[命令行执行.webm](https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/演示视频/命令行执行.webm)》完成==
+**可结合项目配套演示视频《[命令行执行.webm](https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/演示视频/命令行执行.webm)》完成**
 
 ##### 2. QT部署运行
 
-==见项目配套演示视频《[qt执行.webm](https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/演示视频/qt执行.webm)》==
+**见项目配套演示视频《[qt执行.webm](https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/演示视频/qt执行.webm)》**
 
 #### 3. 问题排查
 
-==首先需保证上述流程中高亮部分无遗漏完成==
+**首先需保证上述流程中高亮部分无遗漏完成**
 
 #####  1. roslaunch报错px4找不到
 
