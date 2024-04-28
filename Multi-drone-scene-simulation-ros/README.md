@@ -112,7 +112,7 @@
 
    `~$ cd PX4-Autopilot/`
 
-   `~$ git submodule update --init –recursive`
+   `~$ git submodule update --init --recursive`
 
 3. 下载完成后安装px4固件包：
 
