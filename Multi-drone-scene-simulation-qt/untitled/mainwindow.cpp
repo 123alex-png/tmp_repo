@@ -243,6 +243,7 @@ void MainWindow::on_envStartButton_clicked()  // 启动仿真环境gazebo
   } else
     return;
 }
+
 void MainWindow::on_globalTaskLoadingButton_clicked()  // 导入任务
                                                        // 启动task_loading
                                                        // task_management
@@ -331,11 +332,6 @@ void MainWindow::on_startTaskExecuteButton_clicked() {
   }
 }
 
-/**
- * @brief: 读取文件的行数
- * @param fileName: 文件名
- * @param data: 文件信息的id列表
- */
 void MainWindow::ReadFirstNum(std::string fileName, std::vector<int> &data) {
   std::ifstream inFile;
   inFile.open(fileName, std::ios::in);
@@ -380,10 +376,6 @@ void MainWindow::on_chooseTaskBox_currentIndexChanged(const QString &arg) {
   }
 }
 
-/**
- * @brief: 显示无人机信息
- * @param msg: 无人机节点发布的自身信息
- */
 void MainWindow::displayUavState(const uav_msgs::UAV_State::ConstPtr &msg) {
   uavId.insert(msg->uav_id);
   std::stringstream ss;
@@ -429,10 +421,6 @@ void MainWindow::displayUavState(const uav_msgs::UAV_State::ConstPtr &msg) {
   seriesOfUAV->replace(points);
 }
 
-/**
- * @brief: 显示任务的信息
- * @param msg: 任务管理节点发布的任务信息
- */
 void MainWindow::displayTaskState(const uav_msgs::Task_List::ConstPtr &msg) {
   uav_msgs::TASK_State task;
 
@@ -507,10 +495,6 @@ void MainWindow::displayTaskState(const uav_msgs::Task_List::ConstPtr &msg) {
   }
 }
 
-/**
- * @brief: 显示无人机相机的实时画面
- * @param name: 无人机节点的名字
- */
 void MainWindow::displayImage(const std::string name) {
   std::string path = globalTaskFilename.toStdString();
   int pos = path.rfind("/");
