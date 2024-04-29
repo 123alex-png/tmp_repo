@@ -11,10 +11,6 @@ using namespace std;
 
 namespace task {
 
-/**
- * @brief: 接受任务信息话题的回调函数
- * @param msg：任务信息
- */
 void TaskState_callBack(
     const uav_msgs::TASK_State::ConstPtr &msg)  // 接收任务信息
 {
@@ -50,9 +46,6 @@ void TaskState_callBack(
   all_tasks.push_back(task);
 }
 
-/**
- * @brief: 打印任务信息
- */
 void ShowTaskInfo() {
   ROS_INFO("all_tasks.length:%ld", all_tasks.size());
   if (all_tasks.size() != 0) {
@@ -72,9 +65,6 @@ void ShowTaskInfo() {
   }
 }
 
-/**
- * @brief: 向Qt发布任务信息
- */
 void AllTaskQt_Publish() {
   if (all_tasks.size() != 0) {
     uav_msgs::Task_List task_list_qt;
@@ -83,21 +73,6 @@ void AllTaskQt_Publish() {
   }
 }
 
-/**
- * @brief: 接收完最后一个任务后进行发布
- * @param msg：最后一个任务的信息
- */
-void LoadLastTask_callBack(const uav_msgs::Last_Task::ConstPtr &msg) {
-  if (msg->is_last_task == true) {
-    task::task_list_msg.task_list = task::all_tasks;
-    all_task_list_pub.publish(task::task_list_msg);
-  }
-}
-
-/**
- * @brief: 任务分配状态的回调函数
- * @param msg：拍卖完的任务的信息
- */
 void AllocatedTaskState_callback(const uav_msgs::TASK_State::ConstPtr &msg) {
   for (int i = 0; i < all_tasks.size(); i++) {
     if (msg->task_id == all_tasks[i].task_id) {

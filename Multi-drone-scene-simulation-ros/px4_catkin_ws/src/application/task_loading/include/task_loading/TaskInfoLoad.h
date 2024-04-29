@@ -1,3 +1,9 @@
+/*******************************************************************
+ * File: TaskInfoLoad.h
+ * Author: lizeshan zhangruiheng
+ * Date: 2024-04-23
+ * Description: 从任务文件中读取任务信息
+ *******************************************************************/
 #ifndef __TASK_INFO_LOAD_H_
 #define __TASK_INFO_LOAD_H_
 
@@ -27,6 +33,12 @@ class TaskInfoLoad {
   ~TaskInfoLoad();
   bool readFiles();
 };
-void anagement_callBack(const std_msgs::String& msg);
+/**
+ * @brief: 表明任务信息已经发送给management节点
+ * @param msg：management节点的反馈消息
+ *
+ * @return
+ */
+void management_callBack(const std_msgs::String& msg);
 
 #endif

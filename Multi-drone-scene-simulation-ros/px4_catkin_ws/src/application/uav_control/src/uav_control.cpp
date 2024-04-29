@@ -2,8 +2,7 @@
  * File: uav_control.cpp
  * Author: lizeshan zhangruiheng
  * Date: 2024-04-23
- * Description:
- *订阅无人机路径规划结果，并控制无人机飞行，对外发布无人机位置状态信息
+ * Description:订阅无人机路径规划结果，并控制无人机飞行，对外发布无人机位置状态信息
  *******************************************************************/
 #include "uav_control/uav_control.h"
 
@@ -152,7 +151,6 @@ void UAV::run() {
   ros::Time task_start_time;
 
   while (ros::ok()) {
-    // ROS_INFO("%s",current_state.mode.c_str());
     if (current_state.mode != "OFFBOARD" &&
         (ros::Time::now() - last_request > ros::Duration(5.0))) {
       if (set_mode_client.call(offb_set_mode) &&
@@ -169,7 +167,6 @@ void UAV::run() {
         last_request = ros::Time::now();
       }
     }
-    // check out of power
     if (power <= min_power) work_state = 4;
     switch (work_state) {
       case 0:  // take off
@@ -336,10 +333,6 @@ void UAV::run() {
   }
 }
 
-/**
- * @brief: 控制无人机起飞
- * @param h：飞行高度h
- */
 void UAV::take_off_land(float h) {
   for (int i = 0; i < uav_dist_xy.size(); i++)
     if (i != uav_id && uav_dist_xy[i] > 0 && uav_dist_xy[i] < safety_dist_xy &&
@@ -354,12 +347,6 @@ void UAV::take_off_land(float h) {
   vel_flight_control(0, 0, delta);
 }
 
-/**
- * @brief: 通过速度控制无人机飞行
- * @param x：x方向上速度分量
- * @param y：y方向上速度分量
- * @param z：z方向上速度分量
- */
 void UAV::vel_flight_control(float x, float y, float z) {
   geometry_msgs::Twist msg;
   msg.linear.x = x;
@@ -368,10 +355,6 @@ void UAV::vel_flight_control(float x, float y, float z) {
   flight_control_pub.publish(msg);
 }
 
-/**
- * @brief: 接收拍卖得到的任务的信息
- * @param msg：任务信息
- */
 void UAV::accepted_task_callback(const uav_msgs::UAV_Tasks::ConstPtr &msg) {
   if (msg->uav_id == uav_id) {
     for (int i = 0; i < msg->uav_tasks.size(); i++) {
@@ -381,9 +364,6 @@ void UAV::accepted_task_callback(const uav_msgs::UAV_Tasks::ConstPtr &msg) {
   }
 }
 
-/**
- * @brief: 发布无人机自身信息
- */
 void UAV::publish_uav_state() {
   uav_msgs::UAV_State msg;
   msg.uav_id = uav_id;
@@ -406,20 +386,12 @@ void UAV::publish_uav_state() {
   uav_state_pub.publish(msg);
 }
 
-/**
- * @brief: 实时更新无人机的速度信息
- * @param msg：无人机当前速度
- */
 void UAV::local_vel_callback(const geometry_msgs::TwistStamped::ConstPtr &msg) {
   velocity.x = msg->twist.linear.x;
   velocity.y = msg->twist.linear.y;
   velocity.z = msg->twist.linear.z;
 }
 
-/**
- * @brief: 实时更新无人机的位置信息
- * @param msg：无人机当前位置
- */
 void UAV::local_pos_callback(const geometry_msgs::PoseStamped::ConstPtr &msg) {
   position.x = msg->pose.position.x + var_x;
   position.y = msg->pose.position.y + var_y;
@@ -437,9 +409,6 @@ void UAV::local_pos_callback(const geometry_msgs::PoseStamped::ConstPtr &msg) {
   }
 }
 
-/**
- * @brief: 通过rviz发布无人机的飞行轨迹
- */
 void UAV::trajectoryVisualize() {
   geometry_msgs::PoseStamped this_pose_stamped;
   this_pose_stamped.pose.position.x = position.x;
@@ -472,13 +441,6 @@ void UAV::readWayPoint() {
   }
 }
 
-/**
- * @brief: 生成任务间的飞行路径点
- * @param start：当前点
- * @param goal：目标点
- *
- * @return 是否成功添加航迹点
- */
 bool UAV::addIndirectWayPoint(const way_point &start, const way_point &goal) {
   way_point tmp_point;
   way_point current_point;
@@ -521,9 +483,6 @@ bool UAV::addIndirectWayPoint(const way_point &start, const way_point &goal) {
   return false;
 }
 
-/**
- * @brief: 对qt发布无人机的信息
- */
 void UAV::publish_all_uav_state() {
   uav_msgs::UAV_State msg;
 

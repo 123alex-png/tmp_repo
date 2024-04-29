@@ -78,12 +78,6 @@ bool TaskInfoLoad::readFiles() {
   return true;
 }
 
-/**
- * @brief: 表明任务信息已经发送给management节点
- * @param msg：management节点的反馈消息
- *
- * @return
- */
 void management_callBack(const std_msgs::String &msg) {
   ROS_INFO("TASK MANAGE READY");
   TaskInfoLoad *cont = new TaskInfoLoad();

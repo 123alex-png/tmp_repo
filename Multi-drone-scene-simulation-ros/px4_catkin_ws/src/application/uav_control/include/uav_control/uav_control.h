@@ -1,3 +1,9 @@
+/*******************************************************************
+ * File: uav_control.h
+ * Author: lizeshan zhangruiheng
+ * Date: 2024-04-23
+ * Description:订阅无人机路径规划结果，并控制无人机飞行，对外发布无人机位置状态信息
+ *******************************************************************/
 #ifndef UAV_CONTROL_CONTROL_H
 #define UAV_CONTROL_CONTROL_H
 
@@ -101,14 +107,14 @@ class UAV {
   uav_msgs::TASK_State current_task;
 
   ros::NodeHandle nh;
-  ros::Subscriber uav_tasks_sub;
   ros::Publisher uav_state_pub;
   ros::Publisher all_uav_state_pub;
   ros::Publisher flight_control_pub;
   ros::Publisher path_to_rviz_pub_;
-
-  ros::Subscriber state_sub;
   ros::Publisher local_pos_pub;
+
+  ros::Subscriber uav_tasks_sub;
+  ros::Subscriber state_sub;
   ros::ServiceClient arming_client;
   ros::ServiceClient set_mode_client;
   ros::Subscriber local_pos_sub;
@@ -119,19 +125,57 @@ class UAV {
   queue<geometry_msgs::Point32> goals;
 
   void readWayPoint();
+  /**
+   * @brief: 生成任务间的飞行路径点
+   * @param start：当前点
+   * @param goal：目标点
+   *
+   * @return 是否成功添加航迹点
+   */
   bool addIndirectWayPoint(const way_point &start, const way_point &goal);
+  /**
+   * @brief: 接收拍卖得到的任务的信息
+   * @param msg：任务信息
+   */
   void accepted_task_callback(const uav_msgs::UAV_Tasks::ConstPtr &msg);
-  void local_pos_callback(
-      const geometry_msgs::PoseStamped::ConstPtr &msg);  // 获取local位置
-  void local_vel_callback(
-      const geometry_msgs::TwistStamped::ConstPtr &msg);  // 获取local速度
-  void state_callback(
-      const mavros_msgs::State::ConstPtr &msg);  // 获取uav状态模式
-  // publish
+  /**
+   * @brief: 实时更新无人机的位置信息
+   * @param msg：无人机当前位置
+   */
+  void local_pos_callback(const geometry_msgs::PoseStamped::ConstPtr &msg);
+  /**
+   * @brief: 实时更新无人机的速度信息
+   * @param msg：无人机当前速度
+   */
+  void local_vel_callback(const geometry_msgs::TwistStamped::ConstPtr &msg);
+  /**
+   * @brief: 获取uav状态模式
+   * @param msg：无人机当前模式
+   */
+  void state_callback(const mavros_msgs::State::ConstPtr &msg);
+  /**
+   * @brief: 发布无人机自身信息
+   */
   void publish_uav_state();
+  /**
+   * @brief: 对qt发布无人机的信息
+   */
   void publish_all_uav_state();
+  /**
+   * @brief: 控制无人机起飞
+   * @param h：飞行高度h
+   */
   void take_off_land(float h);
+  /**
+   * @brief: 通过速度控制无人机飞行
+   * @param x：x方向上速度分量
+   * @param y：y方向上速度分量
+   * @param z：z方向上速度分量
+   */
   void vel_flight_control(float x, float y, float z);
+  /**
+   * @brief: 通过rviz发布无人机的飞行轨迹
+   */
   void trajectoryVisualize();
 
  public:
