@@ -202,7 +202,6 @@ void UAV::run() {
                        indirect_way_point.front().y,
                        indirect_way_point.front().z);
               uav_in_way_point = indirect_way_point.front().id;
-              ROS_INFO("1");
               indirect_way_point.pop();
             } else  // 未到达
             {
