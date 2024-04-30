@@ -12,49 +12,49 @@
 
   + ##### /data 存放场景对应的任务文件
 
-    + /data/hill/waypoint
+    + /data/waypoint
 
       路径点，即任务与任务之间的飞行路线
 
-    + /data/hill/task_info
+    + /data/task_info
 
       任务信息，对应一个设施的全部任务
 
-    + /data/hill/subTask
+    + /data/subTask
 
       子任务信息，对应一个设施的一个特定任务
 
-    + /data/hill/Obstacle
+    + /data/Obstacle
 
       障碍物信息
 
   - ##### /src 存放本项目的功能包代码
 
-    - /src/application/image_transport
+    - /src/image_transport
 
       将无人机搭载摄像头所拍摄的图片保存至本地
 
-    - /src/application/task_allocation
+    - /src/task_allocation
 
       将任务分配给参与拍卖的无人机节点
 
-    - /src/application/task_loading
+    - /src/task_loading
 
       读取任务信息
 
-    - /src/application/task_management
+    - /src/task_management
 
       任务管理节点用于发布任务信息
 
-    - /src/application/uav_control
+    - /src/uav_control
 
       用于控制仿真中无人机的飞行以及发布无人机的位置信息
 
-    - /src/application/uav_msgs
+    - /src/uav_msgs
 
       定义了无人机信息和任务信息的数据格式
 
-    - /src/application/view_point_plan
+    - /src/view_point_plan
 
       用于对任务提取视点和进行路径规划
 

@@ -19,12 +19,13 @@ int main(int argc, char* argv[]) {
   ros::Publisher start_view_plan_pub =
       nh.advertise<uav_msgs::UAV_State>("/start_view_point_plan", 10);
   uav_msgs::UAV_State uav;
+  int number_of_uav = 5;
   int number;  // 阻塞进程
   cin >> number;
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < number_of_uav; i++) {
     uav.uav_id = i;
     start_view_plan_pub.publish(uav);
-    ROS_INFO("111");
+    ROS_INFO("star_view_point_plan");
   }
   ros::spin();
 
