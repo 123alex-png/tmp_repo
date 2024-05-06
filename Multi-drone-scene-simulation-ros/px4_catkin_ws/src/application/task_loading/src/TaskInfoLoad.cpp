@@ -6,11 +6,10 @@
  *******************************************************************/
 #include "task_loading/TaskInfoLoad.h"
 
-using namespace std;
 
 TaskInfoLoad::TaskInfoLoad()
     : nh_(ros::NodeHandle()), nh_private_(ros::NodeHandle("~")) {
-  nh_private_.param<string>("task_directory", task_directory_,
+  nh_private_.param<std::string>("task_directory", task_directory_,
                             "");  // 生成的任务信息路径
   task_state_pub = nh_.advertise<uav_msgs::TASK_State>("/task_state", 20, true);
   ROS_INFO("Task is loading---");
@@ -33,10 +32,10 @@ bool TaskInfoLoad::readFiles() {
   } else {
     while (!feof(input)) {
       uav_msgs::TASK_State task_msg;
-      string task_name;
-      string task_type;
-      string req_uav_type;
-      string req_payload_type;
+      std::string task_name;
+      std::string task_type;
+      std::string req_uav_type;
+      std::string req_payload_type;
       int task_R;
       std::cout << "open file success\n" << std::endl;
       fscanf(input,

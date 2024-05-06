@@ -16,10 +16,10 @@
 #include "ros/ros.h"
 #include "sensor_msgs/CompressedImage.h"
 #include "sensor_msgs/image_encodings.h"
-using namespace std;
+
 cv::Mat imgCallback;
 static void ImageCallback(const sensor_msgs::CompressedImageConstPtr &msg,
-                          string name) {
+                          std::string name) {
   cv_bridge::CvImagePtr cv_ptr_compressed =
       cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
   imgCallback = cv_ptr_compressed->image;

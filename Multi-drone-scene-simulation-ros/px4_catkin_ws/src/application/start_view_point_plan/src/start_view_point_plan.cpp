@@ -11,8 +11,6 @@
 
 #include "std_msgs/String.h"
 
-using namespace std;
-
 int main(int argc, char* argv[]) {
   ros::init(argc, argv, "start_view_point_plan");
   ros::NodeHandle nh;
@@ -21,7 +19,7 @@ int main(int argc, char* argv[]) {
   uav_msgs::UAV_State uav;
   int number_of_uav = 5;
   int number;  // 阻塞进程
-  cin >> number;
+  std::cin >> number;
   for (int i = 0; i < number_of_uav; i++) {
     uav.uav_id = i;
     start_view_plan_pub.publish(uav);

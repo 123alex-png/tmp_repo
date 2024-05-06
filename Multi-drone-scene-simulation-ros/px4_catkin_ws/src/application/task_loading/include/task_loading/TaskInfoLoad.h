@@ -18,11 +18,9 @@
 #include "std_msgs/String.h"
 #include "uav_msgs/TASK_State.h"
 
-using namespace std;
-
 class TaskInfoLoad {
  private:
-  string task_directory_;
+  std::string task_directory_;
   ros::NodeHandle nh_;
   ros::NodeHandle nh_private_;
   ros::Publisher task_state_pub;
@@ -33,6 +31,7 @@ class TaskInfoLoad {
   ~TaskInfoLoad();
   bool readFiles();
 };
+
 /**
  * @brief: 表明任务信息已经发送给management节点
  * @param msg：management节点的反馈消息

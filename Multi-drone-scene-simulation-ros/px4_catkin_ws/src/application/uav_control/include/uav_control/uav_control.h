@@ -31,7 +31,6 @@
 #include <string>
 #include <vector>
 #define MaxValue 0x7fffffff
-using namespace std;
 
 inline float dist(const geometry_msgs::Point32 &a,
                   const geometry_msgs::Point32 &b);
@@ -53,9 +52,9 @@ class UAV {
   int work_state = 3;
   int uav_in_way_point;
   int current_task_id;
-  string uav_name;
-  string uav_type;
-  string payload_type;
+  std::string uav_name;
+  std::string uav_type;
+  std::string payload_type;
   geometry_msgs::Point32 uav_start_pos;
   geometry_msgs::Point32 ground_station;
   geometry_msgs::Point32 position;  //
@@ -73,15 +72,15 @@ class UAV {
   float max_WR;              // 最大风速
   float wl;                  // 防水等级
 
-  vector<int> accepted;  // 记录每架无人机执行任务id列表
-  vector<uav_msgs::TASK_State>
+  std::vector<int> accepted;  // 记录每架无人机执行任务id列表
+  std::vector<uav_msgs::TASK_State>
       accepted_tasks;  // 存从task_allocation发送的uav_tasks，记录每架无人机的执行任务列表
-  vector<way_point> way_point_list;
-  vector<float> between_way_point_height;
+  std::vector<way_point> way_point_list;
+  std::vector<float> between_way_point_height;
 
-  queue<way_point> indirect_way_point;  // 间接路径点
-  string way_point_directory_;
-  string uav_topic_prefix;
+  std::queue<way_point> indirect_way_point;  // 间接路径点
+  std::string way_point_directory_;
+  std::string uav_topic_prefix;
   bool has_task;  // 无人机当前是否有任务做
 
   // flight control
@@ -122,9 +121,10 @@ class UAV {
 
   nav_msgs::Path path_;  // 用于向rviz发送实际飞行路径
 
-  queue<geometry_msgs::Point32> goals;
+  std::queue<geometry_msgs::Point32> goals;
 
   void readWayPoint();
+
   /**
    * @brief: 生成任务间的飞行路径点
    * @param start：当前点
@@ -133,39 +133,47 @@ class UAV {
    * @return 是否成功添加航迹点
    */
   bool addIndirectWayPoint(const way_point &start, const way_point &goal);
+
   /**
    * @brief: 接收拍卖得到的任务的信息
    * @param msg：任务信息
    */
   void accepted_task_callback(const uav_msgs::UAV_Tasks::ConstPtr &msg);
+
   /**
    * @brief: 实时更新无人机的位置信息
    * @param msg：无人机当前位置
    */
   void local_pos_callback(const geometry_msgs::PoseStamped::ConstPtr &msg);
+
   /**
    * @brief: 实时更新无人机的速度信息
    * @param msg：无人机当前速度
    */
   void local_vel_callback(const geometry_msgs::TwistStamped::ConstPtr &msg);
+
   /**
    * @brief: 获取uav状态模式
    * @param msg：无人机当前模式
    */
   void state_callback(const mavros_msgs::State::ConstPtr &msg);
+
   /**
    * @brief: 发布无人机自身信息
    */
   void publish_uav_state();
+
   /**
    * @brief: 对qt发布无人机的信息
    */
   void publish_all_uav_state();
+
   /**
    * @brief: 控制无人机起飞
    * @param h：飞行高度h
    */
   void take_off_land(float h);
+
   /**
    * @brief: 通过速度控制无人机飞行
    * @param x：x方向上速度分量
@@ -173,6 +181,7 @@ class UAV {
    * @param z：z方向上速度分量
    */
   void vel_flight_control(float x, float y, float z);
+  
   /**
    * @brief: 通过rviz发布无人机的飞行轨迹
    */

@@ -7,7 +7,6 @@
 #include "task_management/task_management.h"
 
 #include "std_msgs/String.h"
-using namespace std;
 
 namespace task {
 
@@ -85,6 +84,7 @@ void AllocatedTaskState_callback(const uav_msgs::TASK_State::ConstPtr &msg) {
   }
 }
 }  // namespace task
+
 int main(int argc, char **argv) {
   ros::init(argc, argv, "task_management");
   ros::NodeHandle nh;               // 全局命名空间

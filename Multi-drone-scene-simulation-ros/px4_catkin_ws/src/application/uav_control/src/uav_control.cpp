@@ -21,9 +21,9 @@ void UAV::state_callback(const mavros_msgs::State::ConstPtr &msg) {
 }
 UAV::UAV() {
   nh.param<int>("uav_id", uav_id, 0);
-  nh.param<string>("uav_name", uav_name, "uav_1");
-  nh.param<string>("uav_type", uav_type, "HighwayPatrol");
-  nh.param<string>("payload_type", payload_type, "Camera");
+  nh.param<std::string>("uav_name", uav_name, "uav_1");
+  nh.param<std::string>("uav_type", uav_type, "HighwayPatrol");
+  nh.param<std::string>("payload_type", payload_type, "Camera");
   nh.param<float>("power", power, 10000);
   nh.param<float>("state_pub_interval", state_pub_interval,
                   0.1);  // 每隔0.1s发布无人机状态
@@ -32,7 +32,7 @@ UAV::UAV() {
                   15);  // 水平飞行速度
   nh.param<float>("max_ascending_vel", max_ascending_vel, 3);  // 上升飞行速度
   nh.param<float>("max_descent_vel", max_descent_vel, 3);  // 下降飞行速度
-  nh.param<string>("way_point_directory", way_point_directory_, "");
+  nh.param<std::string>("way_point_directory", way_point_directory_, "");
   nh.param<float>("min_power", min_power, 60);  // 达到最小电量时返回
   nh.param<float>("flight_time", flight_time, 0);  // 飞行时间
   nh.param<int>("work_state", work_state, 3);  // 初始无人机均为空闲状态
@@ -43,7 +43,7 @@ UAV::UAV() {
   nh.param<float>("max_comm_length", max_comm_length,
                   10000);  // 无人机的最大通信距离
   nh.param<float>("flight_height", flight_height, 6);  // 飞行高度
-  nh.param<string>("payload_type", payload_type, "Camera");
+  nh.param<std::string>("payload_type", payload_type, "Camera");
   nh.param<float>("max_WR", max_WR, 15);  // 承受最大风速
   nh.param<float>("wl", wl, 6);
   nh.param<double>("x", var_x, 0);
@@ -64,7 +64,7 @@ UAV::UAV() {
 
   has_task = false;
 
-  stringstream ss;
+  std::stringstream ss;
   ss << "/uav" << uav_id;
   uav_topic_prefix = ss.str();
   uav_state_pub = nh.advertise<uav_msgs::UAV_State>(
@@ -426,10 +426,10 @@ void UAV::trajectoryVisualize() {
 void UAV::readWayPoint() {
   way_point_list.resize(0);
   between_way_point_height.resize(0);
-  ifstream way_point_file;
-  way_point_file.open(way_point_directory_, ios::in);
+  std::ifstream way_point_file;
+  way_point_file.open(way_point_directory_, std::ios::in);
   if (!way_point_file) {
-    cout << "open way_point file for read error\n" << endl;
+    std::cout << "open way_point file for read error\n" << std::endl;
   }
   way_point tmp_way_point;
   float tmp_way_point_height;
