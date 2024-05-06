@@ -32,7 +32,7 @@
 
 见下图示意：
 
-![image]([img/1.png](https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/preview/%E4%BB%BB%E5%8A%A1%E8%A7%84%E5%88%92.png))
+![image](https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/preview/%E4%BB%BB%E5%8A%A1%E8%A7%84%E5%88%92.png)
 
 ##### 4. 点击启动uav节点按钮，等待终端运行
 
