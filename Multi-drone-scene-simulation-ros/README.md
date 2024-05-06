@@ -297,7 +297,7 @@
 ### goto->3.开始执行任务rosrun start_execute_task start_execute_task
 ```
 
-**可结合项目配套演示视频《[命令行执行.webm](https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/演示视频/命令行执行.webm)》完成**
+**演示视频见https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91/qt%E6%89%A7%E8%A1%8C.webm**
 
 ##### 2. QT部署运行
 
