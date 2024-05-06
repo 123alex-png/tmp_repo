@@ -32,13 +32,13 @@
 
 见下图示意：
 
-![image](https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/preview/%E4%BB%BB%E5%8A%A1%E8%A7%84%E5%88%92.png)
+![image](https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/preview/%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD%E5%8F%8A%E4%BB%BF%E7%9C%9F%E7%8E%AF%E5%A2%83%E5%90%AF%E5%8A%A8.png)
 
 ##### 4. 点击启动uav节点按钮，等待终端运行
 
 见下图示意：
 
-![image](img/2.png)
+![image](https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/preview/%E4%BB%BB%E5%8A%A1%E8%A7%84%E5%88%92.png)
 
 ##### 5. 此时任务信息框中应已显示相关的任务信息，点击任务分配按钮，等待终端运行
 
@@ -50,4 +50,4 @@
 
 见下图示意：
 
-![image](img/3.png)
+![image](https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/preview/%E6%97%A0%E4%BA%BA%E6%9C%BA%E4%BF%A1%E6%81%AF%E5%9B%9E%E4%BC%A0.png)
