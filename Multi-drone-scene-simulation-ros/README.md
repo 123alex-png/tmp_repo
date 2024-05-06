@@ -138,7 +138,7 @@
 
 6. 编译完成显示以下说明编译成功：
 
-   ![image](img/1.png)
+   ![image](https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/preview/px4.png)
 
 7. 将px4路径添加入环境变量：
 
