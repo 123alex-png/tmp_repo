@@ -505,8 +505,7 @@ void MainWindow::displayImage(const std::string name) {
                     "/image_save.jpg";
   QString filename = QString::fromStdString(str);
   QImage *img = new QImage(filename);
-  data / if (name == "uav0")
-             ui->image_label1->setPixmap(QPixmap::fromImage(*img));
+  if (name == "uav0") ui->image_label1->setPixmap(QPixmap::fromImage(*img));
   if (name == "uav1") ui->image_label2->setPixmap(QPixmap::fromImage(*img));
   if (name == "uav2") ui->image_label3->setPixmap(QPixmap::fromImage(*img));
   if (name == "uav3") ui->image_label4->setPixmap(QPixmap::fromImage(*img));
