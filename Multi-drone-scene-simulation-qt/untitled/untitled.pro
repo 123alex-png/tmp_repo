@@ -10,16 +10,16 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    QRosThread.cpp \
-    main.cpp \
-    mainwindow.cpp
+    Sources/QRosThread.cpp \
+    Sources/main.cpp \
+    Sources/mainwindow.cpp
 
 HEADERS += \
-    QRosThread.h \
-    mainwindow.h
+    Headers/QRosThread.h \
+    Headers/mainwindow.h
 
 FORMS += \
-    mainwindow.ui
+    Forms/mainwindow.ui
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
@@ -33,6 +33,9 @@ RESOURCES += \
 DISTFILES +=
 
 INCLUDEPATH += /opt/ros/noetic/include
+INCLUDEPATH += $$PWD/Sources
+INCLUDEPATH += $$PWD/Headers
+INCLUDEPATH += $$PWD/Forms
 INCLUDEPATH += /home/cs504/px4_catkin_ws/devel/include
 DEPENDPATH += /opt/ros/noetic/lib
 LIBS += -L/opt/ros/noetic/lib
