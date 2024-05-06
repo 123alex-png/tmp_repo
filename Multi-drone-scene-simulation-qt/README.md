@@ -47,3 +47,6 @@
 
 见下图示意：
 ![image](https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/preview/%E4%BB%BB%E5%8A%A1%E8%A7%84%E5%88%92.png)
+
+**演示视频见https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91/qt%E6%89%A7%E8%A1%8C.webm**
+
