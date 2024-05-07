@@ -115,6 +115,6 @@ class MainWindow : public QMainWindow {
   QLineSeries *seriesOfWaypoint;
   QScatterSeries *seriesOfTask;
   QMutex mutex;
-  QVector<QPointF> points;
+  QVector<QPointF> pointsOfUAV;
 };
 #endif  // MAINWINDOW_H

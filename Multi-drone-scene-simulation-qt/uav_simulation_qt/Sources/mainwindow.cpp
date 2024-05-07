@@ -80,8 +80,6 @@ MainWindow::MainWindow(QWidget *parent)
           SLOT(displayImage(const std::string)));
   qrosthread->start();
 
-  QImage image(":/resource/image/control.png");
-
   start_view_plan_pub =
       nh.advertise<uav_msgs::UAV_State>("/start_view_point_plan", 10);
   start_execute_task_pub =
@@ -92,37 +90,38 @@ MainWindow::MainWindow(QWidget *parent)
   seriesOfUAV->setMarkerShape(
       QScatterSeries::MarkerShapeCircle);  // 设置绘制的散点的样式为圆
   seriesOfUAV->setMarkerSize(10);
+  pointsOfUAV.append(QPointF(0, 0));
+  pointsOfUAV.append(QPointF(0, 0));
+  pointsOfUAV.append(QPointF(0, 0));
+  pointsOfUAV.append(QPointF(0, 0));
+  pointsOfUAV.append(QPointF(0, 0));  //无人机初始位置
+  for (int i = 0; i < pointsOfUAV.size(); i++) {
+    seriesOfUAV->append(0, 0);
+  }
+
   seriesOfWaypoint = new QLineSeries();
   seriesOfWaypoint->setName("航点");
+  seriesOfWaypoint->setVisible(true);
+  seriesOfWaypoint->setPointsVisible(true);
+  seriesOfWaypoint->setPointLabelsVisible(true);
 
   seriesOfTask = new QScatterSeries();
   seriesOfTask->setName("任务");
   seriesOfTask->setMarkerShape(
       QScatterSeries::MarkerShapeCircle);  // 设置绘制的散点的样式为圆
   seriesOfTask->setMarkerSize(10);
+
   ui->chartView->chart()->addSeries(seriesOfTask);
-  seriesOfWaypoint->setVisible(true);
-  seriesOfWaypoint->setPointsVisible(true);
-  seriesOfWaypoint->setPointLabelsVisible(true);
-  for (int i = 0; i < 5; i++) {
-    seriesOfUAV->append(0, 0);
-  }
+  ui->chartView->chart()->addSeries(seriesOfUAV);
+  ui->chartView->chart()->addSeries(seriesOfWaypoint);
   ui->chartView->chart()->setBackgroundVisible(false);
   ui->chartView->chart()->legend()->setVisible(true);
   ui->chartView->chart()->legend()->setAlignment(Qt::AlignBottom);
-  ui->chartView->chart()->addSeries(seriesOfUAV);
-  ui->chartView->chart()->addSeries(
-      seriesOfWaypoint);  // 将创建的series添加经chart中
   ui->chartView->chart()->createDefaultAxes();
   ui->chartView->chart()->axisX()->setMax(100);
   ui->chartView->chart()->axisY()->setMax(200);
   ui->chartView->chart()->axisX()->setMin(-100);
   ui->chartView->chart()->axisY()->setMin(-200);
-  points.append(QPointF(0, 0));
-  points.append(QPointF(0, 0));
-  points.append(QPointF(0, 0));
-  points.append(QPointF(0, 0));
-  points.append(QPointF(0, 0));
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -417,8 +416,8 @@ void MainWindow::displayUavState(const uav_msgs::UAV_State::ConstPtr &msg) {
   ui->uavStateTableWidget->setItem(msg->uav_id, 10,
                                    new QTableWidgetItem(acceptedTask.c_str()));
   QMutexLocker locker(&mutex);
-  points[msg->uav_id] = QPointF(msg->position.x, msg->position.y);
-  seriesOfUAV->replace(points);
+  pointsOfUAV[msg->uav_id] = QPointF(msg->position.x, msg->position.y);
+  seriesOfUAV->replace(pointsOfUAV);
 }
 
 void MainWindow::displayTaskState(const uav_msgs::Task_List::ConstPtr &msg) {
