@@ -212,13 +212,15 @@
 
 ##### 5. 补充配置
 
-​	1. 额外安装xmlstarlet
+1. 额外安装xmlstarlet
 
-​		`sudo apt-get install xmlstarlet`
+   ​		`sudo apt-get install xmlstarlet`
 
 2. 将view_point_plan/scripts/PointNetwork中cal_path.py中环境变量更改为本机Anaconda位置
 
      `#!/home/xxx/anaconda3/envs/torch/bin/python`
+
+3. 请确保ros各功能包中scripts中的python文件的“允许作为可执行文件运行”已选中
 
 ### 部署运行
 
