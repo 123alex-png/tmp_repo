@@ -95,9 +95,7 @@ MainWindow::MainWindow(QWidget *parent)
   pointsOfUAV.append(QPointF(0, 0));
   pointsOfUAV.append(QPointF(0, 0));
   pointsOfUAV.append(QPointF(0, 0));  //无人机初始位置
-  for (int i = 0; i < pointsOfUAV.size(); i++) {
-    seriesOfUAV->append(0, 0);
-  }
+  seriesOfUAV->replace(pointsOfUAV);
 
   seriesOfWaypoint = new QLineSeries();
   seriesOfWaypoint->setName("航点");
