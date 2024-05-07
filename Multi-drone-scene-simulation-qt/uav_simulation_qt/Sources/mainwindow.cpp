@@ -267,9 +267,9 @@ void MainWindow::on_globalTaskLoadingButton_clicked()  // 导入任务
       "task_management'";
   std::string startViewPlanCommand =
       "gnome-terminal --tab -- bash -ic 'roslaunch view_point_plan "
-      "uavs5_view_point_plan.launch _subTask_filename:=" +
+      "uavs5_view_point_plan.launch subTask_filename:=" +
       subTaskFilename.toStdString() +
-      " _obstacles_filename:=" + obstaclesFilename.toStdString() + " '";
+      " obstacles_filename:=" + obstaclesFilename.toStdString() + " '";
   system(startTaskLoadingCommand.c_str());
   system(startTaskManagementCommand.c_str());
   system(startViewPlanCommand.c_str());
