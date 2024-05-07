@@ -22,6 +22,8 @@
 
 ​	安装时需Qt charts插件和Qt web插件，或者直接选择安装全部插件
 
+   其中.pro文件里INCLUDEPATH += /home/xxx/px4_catkin_ws/devel/include需换成相应的路径
+
 ### 工具运行
 
 ##### 1. 选择相应的仿真配置文件并启动gazebo，等待gazebo加载完成
