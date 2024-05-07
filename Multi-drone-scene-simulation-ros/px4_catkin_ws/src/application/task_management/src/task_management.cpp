@@ -8,8 +8,6 @@
 
 #include "std_msgs/String.h"
 
-namespace task {
-
 void TaskState_callBack(
     const uav_msgs::TASK_State::ConstPtr &msg)  // 接收任务信息
 {
@@ -83,7 +81,6 @@ void AllocatedTaskState_callback(const uav_msgs::TASK_State::ConstPtr &msg) {
     }
   }
 }
-}  // namespace task
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "task_management");
@@ -96,16 +93,16 @@ int main(int argc, char **argv) {
   manage.data = "management is ok";
   management.publish(manage);
 
-  task::task_state_sub = nh.subscribe(
-      "/task_state", 20, &task::TaskState_callBack);  // 接收task_loading的任务
-  task::allocated_task_state_sub =
+  task_state_sub = nh.subscribe(
+      "/task_state", 20, &TaskState_callBack);  // 接收task_loading的任务
+  allocated_task_state_sub =
       nh.subscribe("/allocated_task_state", 20,
-                   &task::AllocatedTaskState_callback);  // 实时更新任务状态
-  task::all_task_list_pub = nh.advertise<uav_msgs::Task_List>(
+                   &AllocatedTaskState_callback);  // 实时更新任务状态
+  all_task_list_pub = nh.advertise<uav_msgs::Task_List>(
       "/all_task_list", 5, true);  // 发布所有任务
-  task::all_tasks_allocate_pub = nh.advertise<uav_msgs::Task_List>(
+  all_tasks_allocate_pub = nh.advertise<uav_msgs::Task_List>(
       "/all_task_allocate", 5, true);  // 发布到allocate分配
-  task::all_tasks_qt_pub = nh.advertise<uav_msgs::Task_List>(
+  all_tasks_qt_pub = nh.advertise<uav_msgs::Task_List>(
       "/all_task_qt", 5, true);  // 发布到qt显示
 
   bool tasks_allocate_pub = false;
@@ -113,12 +110,12 @@ int main(int argc, char **argv) {
 
   while (ros::ok()) {
     ros::spinOnce();
-    task::AllTaskQt_Publish();
-    if (task::all_tasks_allocate_pub.getNumSubscribers() > 0 &&
+    AllTaskQt_Publish();
+    if (all_tasks_allocate_pub.getNumSubscribers() > 0 &&
         tasks_allocate_pub == false) {
       uav_msgs::Task_List task_list_allocate;
-      task_list_allocate.task_list = task::all_tasks;
-      task::all_tasks_allocate_pub.publish(task_list_allocate);
+      task_list_allocate.task_list = all_tasks;
+      all_tasks_allocate_pub.publish(task_list_allocate);
       tasks_allocate_pub = true;
     }
 
