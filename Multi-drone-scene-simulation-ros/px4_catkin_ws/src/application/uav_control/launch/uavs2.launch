@@ -19,9 +19,9 @@
         <param name="max_flight_time" type="double" value="1800"/>
         <param name="state_pub_interval" type="double" value="1"/>
         <param name="velocity_size" type="double" value="5"/>
-        <param name="x" type="double" value="-10"/>
-        <param name="y" type="double" value="0"/>
-        <param name="z" type="double" value="0"/>
+        <param name="x" type="double" value="6"/>
+        <param name="y" type="double" value="5"/>
+        <param name="z" type="double" value="0.1"/>
          <param name="way_point_directory" value="$(arg way_point_directory)"/>
     </group>
 </launch>
