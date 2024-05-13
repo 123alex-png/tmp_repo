@@ -10,16 +10,16 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    Sources/QRosThread.cpp \
-    Sources/main.cpp \
-    Sources/mainwindow.cpp
+    src/QRosThread.cpp \
+    src/main.cpp \
+    src/mainwindow.cpp
 
 HEADERS += \
-    Headers/QRosThread.h \
-    Headers/mainwindow.h
+    src/QRosThread.h \
+    src/mainwindow.h
 
 FORMS += \
-    Forms/mainwindow.ui
+    resources/ui/mainwindow.ui
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
@@ -28,7 +28,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 QMAKE_CXXFLAGS+=-Wno-deprecated-copy
 
 RESOURCES += \
-    Resources.qrc
+    resources/Resources.qrc
 
 DISTFILES +=
 
@@ -36,7 +36,7 @@ INCLUDEPATH += /opt/ros/noetic/include
 INCLUDEPATH += $$PWD/Sources
 INCLUDEPATH += $$PWD/Headers
 INCLUDEPATH += $$PWD/Forms
-INCLUDEPATH += /home/xxx/px4_catkin_ws/devel/include
+INCLUDEPATH += /home/cs504/px4_catkin_ws/devel/include
 DEPENDPATH += /opt/ros/noetic/lib
 LIBS += -L/opt/ros/noetic/lib
 LIBS += /opt/ros/noetic/lib/librosbag.so
