@@ -205,16 +205,8 @@ void UAV::run() {
               indirect_way_point.pop();
             } else  // 未到达
             {
-              delta.x = indirect_goal_point.x - position.x;
-              delta.y = indirect_goal_point.y - position.y;
-              delta.z = indirect_goal_point.z - position.z;
-              float size = dist(indirect_goal_point, position);
-              if (size > velocity_size) {
-                delta.x = delta.x / size * velocity_size;
-                delta.y = delta.y / size * velocity_size;
-                delta.z = delta.z / size * velocity_size;
-              }
-              vel_flight_control(delta.x, delta.y, delta.z);
+              vel_flight_control(indirect_goal_point.x, indirect_goal_point.y,
+                                 indirect_goal_point.z);
             }
           } else {
             ROS_WARN(
@@ -301,16 +293,7 @@ void UAV::run() {
         {
           if (!goals.empty()) {
             geometry_msgs::Point32 tmp_point = goals.front();
-            delta.x = tmp_point.x - position.x;
-            delta.y = tmp_point.y - position.y;
-            delta.z = tmp_point.z - position.z;
-            float size = dist(tmp_point, position);
-            if (size > velocity_size) {
-              delta.x = delta.x / size * velocity_size;
-              delta.y = delta.y / size * velocity_size;
-              delta.z = delta.z / size * velocity_size;
-            }
-            vel_flight_control(delta.x, delta.y, delta.z);
+            vel_flight_control(tmp_point.x, tmp_point.y, tmp_point.z);
             if ((dist(tmp_point, position) < flight_distance_error)) {
               goals.pop();
             }
@@ -339,19 +322,15 @@ void UAV::take_off_land(float h) {
       h = uav_z[i] + 1.5;
       if (h < default_height + 1.5) h = default_height + 1.5;
     }
-  float delta = h - position.z;
-  float size = fabs(delta);
-  if (size > take_off_land_vel_size)
-    delta = delta / size * take_off_land_vel_size;
-  vel_flight_control(0, 0, delta);
+  vel_flight_control(var_x, var_y, h);
 }
 
 void UAV::vel_flight_control(float x, float y, float z) {
-  geometry_msgs::Twist msg;
-  msg.linear.x = x;
-  msg.linear.y = y;
-  msg.linear.z = z;
-  flight_control_pub.publish(msg);
+  geometry_msgs::PoseStamped pose;
+  pose.pose.position.x = x - var_x;
+  pose.pose.position.y = y - var_y;
+  pose.pose.position.z = z - var_z;
+  local_pos_pub.publish(pose);
 }
 
 void UAV::accepted_task_callback(const uav_msgs::UAV_Tasks::ConstPtr &msg) {
