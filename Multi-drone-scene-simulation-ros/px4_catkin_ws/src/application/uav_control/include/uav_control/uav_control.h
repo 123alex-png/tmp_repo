@@ -175,10 +175,10 @@ class UAV {
   void take_off_land(float h);
 
   /**
-   * @brief: 通过速度控制无人机飞行
-   * @param x：x方向上速度分量
-   * @param y：y方向上速度分量
-   * @param z：z方向上速度分量
+   * @brief: 通过指点无人机飞行
+   * @param x：预期x坐标
+   * @param y：预期y坐标
+   * @param z：预期z坐标
    */
   void vel_flight_control(float x, float y, float z);
   
