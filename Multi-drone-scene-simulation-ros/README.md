@@ -249,7 +249,7 @@
 ##### 1. 终端部署运行
 
 ```
-### 1.启动仿真环境
+### 1.启动仿真环境(**需根据任务场景改变**)
 
 ~$ roslaunch uav_control multi_uav_mavros_sitl_sdf_hill_1.launch
 
@@ -261,7 +261,7 @@
 
 ~$ rosrun start_execute_task start_execute_task
 
-### 4.启动任务加载节点，globalTaskFilename为对应的任务文件路径
+### 4.启动任务加载节点，globalTaskFilename为对应的任务文件路径(需根据任务场景改变)
 
 ~$ rosrun task_loading task_loading _task_directory:=globalTaskFilename
 
@@ -271,14 +271,14 @@
 
 ~$ rosrun task_management task_management 
 
-### 6.启动视点规划节点，subTaskFilename为对应的子任务文件路径&&obstacleFilename为对应的障碍物文件路径
+### 6.启动视点规划节点，subTaskFilename为对应的子任务文件路径&&obstacleFilename为对应的障碍物文件路径(需根据任务场景改变)
 
 ~$ roslaunch view_point_plan uavs2_view_point_plan.launch subTask_filename:= subTaskFilename  
 	obstacles_filename:=obstaclesFilename
 	
 ### 示例：~$ roslaunch view_point_plan uavs5_view_point_plan.launch subTask_filename:=/home/liangzx/px4_catkin_ws_0425/data/hill/subTask_hill.txt obstacles_filename:=/home/liangzx/px4_catkin_ws_0425/data/hill/Obs_hill.txt
 
-### 7.启动无人机节点，wayPointFilename为对应的航点文件路径
+### 7.启动无人机节点，wayPointFilename为对应的航点文件路径(需根据任务场景改变)
 
 ~$ roslaunch uav_control uavs2.launch way_point_directory:= wayPointFilename 
 
