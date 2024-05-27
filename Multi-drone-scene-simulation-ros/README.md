@@ -249,8 +249,7 @@
 ##### 1. 终端部署运行
 
 ```
-### 1.启动仿真环境(**需根据任务场景改变**)
-
+### 1.启动仿真环境(需根据任务场景改变)
 ~$ roslaunch uav_control multi_uav_mavros_sitl_sdf_hill_1.launch
 
 ### 2.进行路径规划
