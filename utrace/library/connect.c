@@ -54,7 +54,6 @@ static int unixDomainSocket(const char* port) {
 }
 
 static void start_client() {
-    printf("Client started\n");
     int client_socket = unixDomainSocket("/tmp/utrace.sock");
     if (client_socket == -1)
         return;
