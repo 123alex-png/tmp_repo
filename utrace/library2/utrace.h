@@ -2,7 +2,6 @@
 #define UTRACE__H
 
 #ifdef __cplusplus
-#include "../src/third-party/nlohmann/json.hpp"
 extern "C" {
 #endif
 
