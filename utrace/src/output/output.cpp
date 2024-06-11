@@ -57,6 +57,18 @@ nlohmann::json simpleData::toJson() const {
     return j;
 }
 
+jsonData::jsonData(const nlohmann::json& j, const time_t time) : data(), j(j) {
+    setTime(time);
+}
+
+nlohmann::json jsonData::toJson() const {
+    using json = nlohmann::json;
+    json j;
+    j["time"] = getTime();
+    j["what"] = this->j;
+    return j;
+}
+
 output::output(const std::string& outputFile) {
     file = std::ofstream(outputFile, std::ios::app);
     outputBuffer = file.rdbuf();

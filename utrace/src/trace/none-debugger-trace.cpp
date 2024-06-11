@@ -58,7 +58,13 @@ void nonDebuggerTrace::work(const pid_t& pid, const int sockfd) {
         if (magichk(0xdeadbeef) == 0)
             break;
 
-        outputWrite(stringData(ss.str(), time));
+        const std::string s = ss.str();
+        try {
+            nlohmann::json j = nlohmann::json::parse(s);
+            outputWrite(jsonData(j, time));
+        } catch (nlohmann::json::parse_error& e) {
+            outputWrite(stringData(s, time));
+        }
     }
     close(sockfd);
 }

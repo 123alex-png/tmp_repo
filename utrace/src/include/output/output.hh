@@ -50,6 +50,15 @@ public:
     nlohmann::json toJson() const override;
 };
 
+class jsonData : public data {
+private:
+    nlohmann::json j;
+
+public:
+    jsonData(const nlohmann::json &j, const time_t time);
+    nlohmann::json toJson() const override;
+};
+
 class output {
 private:
     std::ofstream file;
