@@ -1,0 +1,18 @@
+{
+    "name": "NO ACTUAL USE, ONLY FOR MAN TO READ",
+    "whitelist": [
+        "XXX"
+    ],
+    "trace": "gdb/none",
+    "streams": [
+        {
+            "name": "XXX",
+            "breakpoint": "XXX.c:123",
+            "vars": [
+                "foo",
+                "bar"
+            ]
+        }
+    ],
+    "output": "XXX"
+}

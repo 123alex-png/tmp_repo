@@ -1,6 +1,8 @@
 # Utrace
 
-Utrace is a project that aims to provide a platform for data generation for UOS.
+Utrace is a project that aims to provide a tool for data generation for UOS.
+
+[TODO: This readme file is far from completion.]
 
 ## Table of Contents
 
@@ -39,17 +41,9 @@ sudo apt update
 sudo apt install libboost-all-dev
 ```
 
-3. clang-format
-You can install it follow these steps on Ubuntu:
+### Compile
 
-```
-sudo apt update
-sudo apt install clang-format
-```
-
-### Build
-
-To build utrace, follow these steps:
+To compile utrace, follow these steps:
 
 ```
 git clone https://git.nju.edu.cn/201220073/simple-watcher.git [TODO]
@@ -58,6 +52,14 @@ mkdir build
 cd build 
 cmake ..
 make
+```
+
+### Install
+
+run the following command in the root directory of the project:
+
+```
+sudo ./script/install.sh
 ```
 
 ## Configuration
@@ -74,8 +76,7 @@ TODO
 
 ## Authors
 
-- Yanyan Jiang
-- Yunfan Cao
+TODO
 
 ## Acknowledgments
 

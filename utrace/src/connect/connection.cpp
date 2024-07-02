@@ -38,7 +38,8 @@ std::string connection::getConfig(const pid_t& pid) {
             break;
         path = std::filesystem::path(path).parent_path();
     }
-    throw std::runtime_error("utrace-config.json not found");
+    // throw std::runtime_error("utrace-config.json not found");
+    return "";
 }
 
 connection::connection(int maxClient, const std::string& path)
@@ -95,15 +96,23 @@ void connection::watch() {
             if (data.magicnumber != 0xdeadbeef)
                 throw std::runtime_error("invalid magic number");
 
-            config cfg = config(getConfig(data.pid));
+            auto exit_sliently = [&]() {
+               
+            };
 
-            if (!cfg.check(data.pid)) {
-                unsigned fail = 0xdeadbeef;
-                if (send(client, &fail, sizeof(fail), 0) < 0)
-                    throw std::runtime_error("send failed");
-                close(client);
+            std::string cfg_path = getConfig(data.pid);
+            if (cfg_path.empty()) {
+                exit_sliently();
                 return;
             }
+
+            config cfg = config(cfg_path);
+
+            if (!cfg.check(data.pid)) {
+                exit_sliently();
+                return;
+            }
+            
             cfg.getTrace()->work(data.pid, client);
         };
 

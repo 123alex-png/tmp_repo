@@ -3,7 +3,7 @@ Description=Trace the uos exe.
 After=network.target
 
 [Service]
-ExecStart=/path/to/utrace
+ExecStart=/opt/utrace/utrace
 
 [Install]
 WantedBy=default.target
