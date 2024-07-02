@@ -97,7 +97,10 @@ void connection::watch() {
                 throw std::runtime_error("invalid magic number");
 
             auto exit_sliently = [&]() {
-               
+                unsigned fail = 0xdeadbeef;
+                if (send(client, &fail, sizeof(fail), 0) < 0)
+                    throw std::runtime_error("send failed");
+                close(client);
             };
 
             std::string cfg_path = getConfig(data.pid);
@@ -112,7 +115,7 @@ void connection::watch() {
                 exit_sliently();
                 return;
             }
-            
+
             cfg.getTrace()->work(data.pid, client);
         };
 
