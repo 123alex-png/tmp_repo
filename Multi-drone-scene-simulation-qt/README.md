@@ -33,12 +33,12 @@
 ##### 3. 选择航线路径点文件和场景障碍物文件并点击导入，此处无启动终端运行
 
 见下图示意：
-![image](./uav_simulation_qt/resources/resource_README/File loading simulation env.png)
+![image](./uav_simulation_qt/resources/resource_README/File_load.png)
 
 ##### 4. 点击启动uav节点按钮，等待终端运行
 
 见下图示意：
-![image](./uav_simulation_qt/resources/resource_README/Info reload.png)
+![image](./uav_simulation_qt/resources/resource_README/Info_reload.png)
 
 ##### 5. 此时任务信息框中应已显示相关的任务信息，点击任务分配按钮，等待终端运行
 
@@ -51,5 +51,5 @@
 见下图示意：
 ![image](./uav_simulation_qt/resources/resource_README/task.png)
 
-**演示视频见./uav_simulation_qt/resources/resource_README/qt ac.webm**
+**演示视频见./uav_simulation_qt/resources/resource_README/qt_return.webm**
 
