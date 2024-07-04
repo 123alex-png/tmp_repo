@@ -57,6 +57,8 @@
     - /src/application/view_point_plan
 
       用于对任务提取视点和进行路径规划
+    
+  - ##### /resource_README 存放README中图像和媒体文件
 
 #### 2. 地面站系统
 
@@ -138,7 +140,7 @@
 
 6. 编译完成显示以下说明编译成功：
 
-   ![image](https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/preview/px4.png)
+   ![image](./px4_catkin_ws/resource_README/px4.png)
 
 7. 将px4路径添加入环境变量：
 
@@ -298,11 +300,11 @@
 ### goto->3.开始执行任务rosrun start_execute_task start_execute_task
 ```
 
-**演示视频见https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91/%E5%91%BD%E4%BB%A4%E8%A1%8C%E6%89%A7%E8%A1%8C.webm**
+**演示视频见./px4_catkin_ws/resource_README/execute_in_bash.webm**
 
 ##### 2. QT部署运行
 
-**演示视频见https://github.com/s-kkk/UAV-Project-Codes/blob/main/scene-simulation/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91/qt%E6%89%A7%E8%A1%8C.webm**
+**演示视频见./px4_catkin_ws/resource_README/execute_in_QT.webm**
 
 #### 3. 问题排查
 
