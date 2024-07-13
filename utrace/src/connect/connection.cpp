@@ -116,6 +116,7 @@ void connection::watch() {
                 return;
             }
 
+            std::cout << "Tracing process " << data.pid << std::endl;
             cfg.getTrace()->work(data.pid, client);
         };
 
