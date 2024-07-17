@@ -10,7 +10,7 @@ bool simpleProcessFilter::check(const int& pid) { return true; }
 // implementation of class config
 
 std::shared_ptr<output> config::getOutput() {
-    return std::make_shared<output>(outputFile);
+    return std::make_shared<output>(outputSock);
 }
 
 config::config(const std::string& configFile) {
@@ -67,7 +67,7 @@ config::config(const std::string& configFile) {
 
         // output
         if (j.contains("output"))
-            outputFile = j["output"];
+            outputSock = j["output"];
         else
             throw std::invalid_argument("No output in config file");
 

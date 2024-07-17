@@ -27,7 +27,7 @@ private:
     dbgType type;
 
     //output
-    std::string outputFile;
+    std::string outputSock;
 
     std::shared_ptr<output> getOutput();
 

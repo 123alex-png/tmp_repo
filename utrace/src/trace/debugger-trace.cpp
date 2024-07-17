@@ -26,9 +26,9 @@ simpleBreakpointHandler::simpleBreakpointHandler(
 
 simpleData simpleBreakpointHandler::handle(const std::string& breakpoint,
                                            debugger& inter) {
-    std::vector<std::string> vals;
+    std::unordered_map<std::string, std::string> vals;
     for (auto& var : vars)
-        vals.push_back(inter.evaluateExpression(var));
+        vals.emplace(var, inter.evaluateExpression(var));
     return simpleData(breakpoint, vals);
 }
 

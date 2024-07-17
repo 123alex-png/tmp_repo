@@ -33,11 +33,11 @@ public:
 class simpleData : public data {
 private:
     std::string breakpoint;
-    std::vector<std::string> vals;
+    std::unordered_map<std::string, std::string> vals;
 
 public:
     simpleData(const std::string breakpoint,
-               const std::vector<std::string>& vals);
+                const std::unordered_map<std::string, std::string>& vals);
     nlohmann::json toJson() const override;
 };
 
@@ -61,12 +61,10 @@ public:
 
 class output {
 private:
-    std::ofstream file;
-    std::streambuf* outputBuffer;
+    int sock;
 
 public:
-    output(const std::string& outputFile);
-    output();
+    output(const std::string& outputSock);
     void write(const data& d);
-    void close();
+    ~output();
 };

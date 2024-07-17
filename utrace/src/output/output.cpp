@@ -1,6 +1,10 @@
 #include <ctime>
 #include <fstream>
 #include <output/output.hh>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/un.h>
+#include <unistd.h>
 
 data::data() : time(std::time(nullptr)) {}
 time_t data::getTime() const { return time; }
@@ -45,7 +49,7 @@ nlohmann::json stringData::toJson() const {
 }
 
 simpleData::simpleData(const std::string breakpoint,
-                       const std::vector<std::string>& vals)
+                       const std::unordered_map<std::string, std::string>& vals)
     : data(), breakpoint(breakpoint), vals(vals) {}
 
 nlohmann::json simpleData::toJson() const {
@@ -69,19 +73,24 @@ nlohmann::json jsonData::toJson() const {
     return j;
 }
 
-output::output(const std::string& outputFile) {
-    file = std::ofstream(outputFile, std::ios::app);
-    outputBuffer = file.rdbuf();
-}
+output::output(const std::string& outputSock) {
+    // UNIX Domain Socket
+    sock = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (sock == -1)
+        throw std::runtime_error("socket failed");
 
-output::output() : file() { outputBuffer = std::cout.rdbuf(); }
+    struct sockaddr_un addr {};
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, outputSock.c_str(), sizeof(addr.sun_path) - 1);
+
+    if (connect(sock, (struct sockaddr*)(&addr), sizeof(addr)) == -1)
+        throw std::runtime_error("connect failed");
+}
 
 void output::write(const data& d) {
-    std::ostream output(outputBuffer);
-    output << d.toJson().dump() << std::endl;
+    auto s = d.toJson().dump() + "\n";
+    if (send(sock, s.c_str(), s.size(), 0) != s.size())
+        throw std::runtime_error("send failed");
 }
 
-void output::close() {
-    if (outputBuffer != std::cout.rdbuf())
-        file.close();
-}
+output::~output() { close(sock); }
