@@ -89,6 +89,7 @@ output::output(const std::string& outputSock) {
 
 void output::write(const data& d) {
     auto s = d.toJson().dump() + "\n";
+    std::cout << s << std::endl;
     if (send(sock, s.c_str(), s.size(), 0) != s.size())
         throw std::runtime_error("send failed");
 }
